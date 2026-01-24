@@ -14,6 +14,7 @@ export class RegisterDto {
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(6)
   @Matches(/^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$/)
   username: string;
 
