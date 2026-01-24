@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { UserWithoutPassword } from './types/user-without-password.type';
 
 @Injectable()
@@ -20,6 +20,14 @@ export class UserService {
         OR: [{ email: email }, { username: username }],
       },
       omit: { password: true },
+    });
+  }
+
+  async findOneWithPassword(login: string): Promise<User | null> {
+    return this.prisma.user.findFirst({
+      where: {
+        OR: [{ email: login }, { username: login }],
+      },
     });
   }
 }

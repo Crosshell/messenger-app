@@ -1,11 +1,20 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { UserService } from '../user/user.service';
-import { hash } from 'argon2';
+import { hash, verify } from 'argon2';
+import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async register(dto: RegisterDto): Promise<void> {
     const existingUser = await this.userService.findByEmailOrUsername(
@@ -24,5 +33,18 @@ export class AuthService {
     const hashedPassword = await hash(dto.password);
 
     await this.userService.create({ ...dto, password: hashedPassword });
+  }
+
+  async login(dto: LoginDto): Promise<string> {
+    const user = await this.userService.findOneWithPassword(dto.login);
+
+    const isValid = user && (await verify(user.password, dto.password));
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid login or password');
+    }
+
+    const payload = { sub: user.id };
+
+    return this.jwtService.signAsync(payload);
   }
 }

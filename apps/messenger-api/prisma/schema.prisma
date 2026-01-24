@@ -53,7 +53,7 @@ model Message {
 
   attachments Attachment[]
 
-  @@map("message")
+  @@map("messages")
 }
 
 model Attachment {

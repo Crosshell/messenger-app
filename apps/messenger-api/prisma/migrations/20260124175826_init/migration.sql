@@ -24,7 +24,7 @@ CREATE TABLE "chats" (
 );
 
 -- CreateTable
-CREATE TABLE "message" (
+CREATE TABLE "messages" (
     "id" TEXT NOT NULL,
     "content" TEXT,
     "is_edited" BOOLEAN NOT NULL DEFAULT false,
@@ -34,7 +34,7 @@ CREATE TABLE "message" (
     "chat_id" TEXT NOT NULL,
     "sender_id" TEXT NOT NULL,
 
-    CONSTRAINT "message_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "messages_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -68,13 +68,13 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE INDEX "_UserChats_B_index" ON "_UserChats"("B");
 
 -- AddForeignKey
-ALTER TABLE "message" ADD CONSTRAINT "message_chat_id_fkey" FOREIGN KEY ("chat_id") REFERENCES "chats"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "messages" ADD CONSTRAINT "messages_chat_id_fkey" FOREIGN KEY ("chat_id") REFERENCES "chats"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "message" ADD CONSTRAINT "message_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "messages" ADD CONSTRAINT "messages_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "attachments" ADD CONSTRAINT "attachments_message_id_fkey" FOREIGN KEY ("message_id") REFERENCES "message"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "attachments" ADD CONSTRAINT "attachments_message_id_fkey" FOREIGN KEY ("message_id") REFERENCES "messages"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_UserChats" ADD CONSTRAINT "_UserChats_A_fkey" FOREIGN KEY ("A") REFERENCES "chats"("id") ON DELETE CASCADE ON UPDATE CASCADE;
