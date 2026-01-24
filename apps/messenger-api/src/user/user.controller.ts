@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { CurrentUserId } from '../auth/decorators/current-user-id.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Authorization } from '../auth/decorators/authorization.decorator';
 import type { UserWithoutPassword } from './types/user-without-password.type';
 import { UserService } from './user.service';
@@ -10,7 +10,9 @@ export class UserController {
 
   @Get('me')
   @Authorization()
-  async getMe(@CurrentUserId() userId: string): Promise<UserWithoutPassword> {
+  async getMe(
+    @CurrentUser('sub') userId: string,
+  ): Promise<UserWithoutPassword> {
     return this.service.findOneOrThrow(userId);
   }
 }
