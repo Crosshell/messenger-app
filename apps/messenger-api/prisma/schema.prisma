@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MessageStatus {
+  SENT
+  READ
+  FAILED
+}
+
+model User {
+  id        String   @id @default(uuid(4))
+  username  String   @unique
+  email     String   @unique
+  password  String
+  avatarUrl String?  @map("avatar_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  chats    Chat[]    @relation("UserChats")
+  messages Message[]
+
+  @@map("users")
+}
+
+model Chat {
+  id        String   @id @default(uuid(4))
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  participants User[]    @relation("UserChats")
+  messages     Message[]
+
+  @@map("chats")
+}
+
+model Message {
+  id        String        @id @default(uuid(4))
+  content   String?
+  isEdited  Boolean       @default(false) @map("is_edited")
+  status    MessageStatus
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  chat     Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId   String @map("chat_id")
+  sender   User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  senderId String @map("sender_id")
+
+  attachments Attachment[]
+
+  @@map("message")
+}
+
+model Attachment {
+  id       String  @id @default(uuid())
+  url      String
+  filename String
+  mimeType String? @map("mime_type")
+  size     Int?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  messageId String  @map("message_id")
+
+  @@map("attachments")
+}
