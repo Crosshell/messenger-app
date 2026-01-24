@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 import { UserWithoutPassword } from './types/user-without-password.type';
@@ -9,6 +9,17 @@ export class UserService {
 
   async create(data: Prisma.UserCreateInput): Promise<UserWithoutPassword> {
     return this.prisma.user.create({ data, omit: { password: true } });
+  }
+
+  async findOneOrThrow(id: string): Promise<UserWithoutPassword> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      omit: { password: true },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   async findByEmailOrUsername(
