@@ -13,17 +13,25 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { MessageResponse } from '../common/responses/message.response';
 import { LoginDto } from './dto/login.dto';
-import type { Response } from 'express';
+import type { CookieOptions, Response } from 'express';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Authorization } from './decorators/authorization.decorator';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { RefreshJwtGuard } from './guards/refresh-jwt.guard';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly service: AuthService) {}
+  private readonly cookieConfig: CookieOptions;
+
+  constructor(
+    private readonly service: AuthService,
+    private readonly config: ConfigService,
+  ) {
+    this.cookieConfig = this.config.getOrThrow<CookieOptions>('cookie');
+  }
 
   @Post('register')
   async register(@Body() dto: RegisterDto): Promise<MessageResponse> {
@@ -56,7 +64,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
     const { refreshToken, accessToken } = await this.service.login(dto);
-    res.cookie('refreshToken', refreshToken);
+    res.cookie('refreshToken', refreshToken, this.cookieConfig);
     return { accessToken };
   }
 
@@ -68,7 +76,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
     const { refreshToken, accessToken } = await this.service.refresh(userId);
-    res.cookie('refreshToken', refreshToken);
+    res.cookie('refreshToken', refreshToken, this.cookieConfig);
     return { accessToken };
   }
 

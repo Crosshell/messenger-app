@@ -16,7 +16,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.use(cookieParser(config.getOrThrow<string>('cookies.secret')));
+  app.use(cookieParser(config.getOrThrow<string>('cookie.secret')));
 
   app.setGlobalPrefix('api');
 

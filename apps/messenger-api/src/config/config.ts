@@ -16,7 +16,18 @@ export default () => ({
       expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
     },
   },
-  cookies: {
-    secret: process.env.COOKIES_SECRET,
+  cookie: {
+    secret: process.env.COOKIE_SECRET,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+  },
+  token: {
+    passwordTtl:
+      process.env.TOKEN_PASSWORD_TTL &&
+      parseInt(process.env.TOKEN_PASSWORD_TTL, 10),
+    emailTtl:
+      process.env.TOKEN_EMAIL_TTL && parseInt(process.env.TOKEN_EMAIL_TTL, 10),
   },
 });

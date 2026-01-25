@@ -2,19 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Token, TokenType } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TokenService {
-  private readonly TTL_MS = {
-    [TokenType.EMAIL]: 60 * 60 * 1000,
-    [TokenType.PASSWORD]: 60 * 60 * 1000,
-  };
-
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+  ) {}
 
   async create(userId: string, type: TokenType): Promise<string> {
     const token = randomUUID();
-    const expiresAt = new Date(Date.now() + this.TTL_MS[type]);
+    const expiresAt = new Date(Date.now() + this.getTtl[type]);
 
     await this.prisma.$transaction([
       this.prisma.token.deleteMany({
@@ -49,4 +48,12 @@ export class TokenService {
 
     return token;
   }
+
+  private getTtl = (type: TokenType) => {
+    return {
+      [TokenType.EMAIL]: this.config.getOrThrow<number>('token.email.ttl'),
+      [TokenType.PASSWORD]:
+        this.config.getOrThrow<number>('token.password.ttl'),
+    }[type];
+  };
 }
