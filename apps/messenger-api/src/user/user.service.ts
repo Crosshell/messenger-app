@@ -57,6 +57,6 @@ export class UserService {
     data: Prisma.UserUpdateInput,
   ): Promise<void> {
     await this.findOneOrThrow(where);
-    await this.prisma.user.update({ where, data });
+    await this.prisma.user.update({ where, data, omit: { password: true } });
   }
 }

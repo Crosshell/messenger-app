@@ -10,7 +10,7 @@ export class EmailService {
     private mailer: MailerService,
     private config: ConfigService,
   ) {
-    this.clientBaseUrl = this.config.getOrThrow<string>('CLIENT_BASE_URL');
+    this.clientBaseUrl = this.config.getOrThrow<string>('clientBaseUrl');
   }
 
   async sendVerificationEmail(

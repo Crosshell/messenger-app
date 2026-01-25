@@ -9,14 +9,14 @@ async function bootstrap() {
 
   const config = app.get(ConfigService);
 
-  const clientUrl = config.getOrThrow<string>('CLIENT_BASE_URL');
+  const clientUrl = config.getOrThrow<string>('clientBaseUrl');
 
   app.enableCors({
     origin: clientUrl,
     credentials: true,
   });
 
-  app.use(cookieParser(config.getOrThrow<string>('COOKIES_SECRET')));
+  app.use(cookieParser(config.getOrThrow<string>('cookies.secret')));
 
   app.setGlobalPrefix('api');
 
@@ -27,7 +27,7 @@ async function bootstrap() {
     }),
   );
 
-  const port = config.get<number>('PORT') ?? 3000;
+  const port = config.getOrThrow<number>('port');
   await app.listen(port, '0.0.0.0');
 }
 bootstrap();
