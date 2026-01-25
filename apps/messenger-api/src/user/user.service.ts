@@ -44,6 +44,14 @@ export class UserService {
     });
   }
 
+  async updatePassword(userId: string, password: string): Promise<void> {
+    await this.findOneOrThrow({ id: userId });
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password },
+    });
+  }
+
   async markEmailAsVerified(userId: string): Promise<void> {
     await this.findOneOrThrow({ id: userId });
     await this.prisma.user.update({

@@ -28,4 +28,20 @@ export class EmailService {
       },
     });
   }
+
+  async sendPasswordResetEmail(
+    email: string,
+    username: string,
+    token: string,
+  ): Promise<void> {
+    await this.mailer.sendMail({
+      to: email,
+      subject: 'Reset Password',
+      template: 'reset-password',
+      context: {
+        username,
+        link: `${this.clientBaseUrl}/reset-password?token=${token}`,
+      },
+    });
+  }
 }

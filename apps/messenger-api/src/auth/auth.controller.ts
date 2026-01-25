@@ -18,6 +18,8 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { Authorization } from './decorators/authorization.decorator';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { RefreshJwtGuard } from './guards/refresh-jwt.guard';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -78,5 +80,21 @@ export class AuthController {
   ): Promise<MessageResponse> {
     res.clearCookie('refreshToken');
     return { message: 'Successfully logged out' };
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(
+    @Body() dto: ForgotPasswordDto,
+  ): Promise<MessageResponse> {
+    await this.service.forgotPassword(dto);
+    return { message: 'Password reset link sent' };
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() dto: ResetPasswordDto): Promise<MessageResponse> {
+    await this.service.resetPassword(dto);
+    return { message: 'Password reset successfully' };
   }
 }

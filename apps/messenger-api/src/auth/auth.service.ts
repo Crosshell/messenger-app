@@ -17,6 +17,8 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './types/jwt-payload.interface';
 import type { StringValue } from 'ms';
 import { ConfigService } from '@nestjs/config';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -106,6 +108,30 @@ export class AuthService {
       user.username,
       token,
     );
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
+    const user = await this.userService.findOneOrThrow({
+      email: dto.email,
+    });
+
+    const token = await this.tokenService.create(user.id, TokenType.PASSWORD);
+    await this.emailService.sendPasswordResetEmail(
+      dto.email,
+      user.username,
+      token,
+    );
+  }
+
+  async resetPassword(dto: ResetPasswordDto): Promise<void> {
+    const data = await this.tokenService.consume(dto.token);
+    if (!data) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    const hashedPassword = await hash(dto.password);
+
+    await this.userService.updatePassword(data.userId, hashedPassword);
   }
 
   private async generateAuthTokens(
