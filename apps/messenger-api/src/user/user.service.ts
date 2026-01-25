@@ -30,7 +30,7 @@ export class UserService {
   ): Promise<UserWithoutPassword | null> {
     return this.prisma.user.findFirst({
       where: {
-        OR: [{ email: email }, { username: username }],
+        OR: [{ email }, { username }],
       },
       omit: { password: true },
     });
@@ -45,18 +45,18 @@ export class UserService {
   }
 
   async updatePassword(userId: string, password: string): Promise<void> {
-    await this.findOneOrThrow({ id: userId });
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { password },
-    });
+    await this.update({ id: userId }, { password });
   }
 
   async markEmailAsVerified(userId: string): Promise<void> {
-    await this.findOneOrThrow({ id: userId });
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { isEmailVerified: true },
-    });
+    await this.update({ id: userId }, { isEmailVerified: true });
+  }
+
+  async update(
+    where: Prisma.UserWhereUniqueInput,
+    data: Prisma.UserUpdateInput,
+  ): Promise<void> {
+    await this.findOneOrThrow(where);
+    await this.prisma.user.update({ where, data });
   }
 }
