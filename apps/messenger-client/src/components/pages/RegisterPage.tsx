@@ -36,6 +36,7 @@ export const RegisterPage = () => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
+            type="text"
             placeholder="Username"
             icon={<User size={20} />}
             {...register('username')}

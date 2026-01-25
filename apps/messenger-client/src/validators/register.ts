@@ -4,11 +4,17 @@ export const registerSchema = z
   .object({
     username: z
       .string()
-      .min(6, { message: 'Username must be at least 6 characters long' }),
+      .min(6, { message: 'Username must be at least 6 characters long' })
+      .regex(/^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$/, {
+        message: 'Username can only contain letters, numbers and dashes',
+      }),
+
     email: z.string().email({ message: 'Invalid email address' }),
+
     password: z
       .string()
       .min(6, { message: 'Password must be at least 6 characters long' }),
+
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
