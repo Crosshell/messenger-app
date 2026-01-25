@@ -11,9 +11,11 @@ export class UserService {
     return this.prisma.user.create({ data, omit: { password: true } });
   }
 
-  async findOneOrThrow(id: string): Promise<UserWithoutPassword> {
+  async findOneOrThrow(
+    where: Prisma.UserWhereUniqueInput,
+  ): Promise<UserWithoutPassword> {
     const user = await this.prisma.user.findUnique({
-      where: { id },
+      where,
       omit: { password: true },
     });
     if (!user) {
@@ -39,6 +41,14 @@ export class UserService {
       where: {
         OR: [{ email: login }, { username: login }],
       },
+    });
+  }
+
+  async markEmailAsVerified(userId: string): Promise<void> {
+    await this.findOneOrThrow({ id: userId });
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { isEmailVerified: true },
     });
   }
 }

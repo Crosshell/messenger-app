@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Confirmation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f7;
+            color: #51545e;
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+        }
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #f4f4f7;
+            padding-bottom: 40px;
+        }
+        .content {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #4a90e2;
+            padding: 25px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .body {
+            padding: 30px;
+            line-height: 1.6;
+        }
+        .button-container {
+            text-align: center;
+            padding: 30px 0;
+        }
+        .button {
+            background-color: #4a90e2;
+            color: #ffffff !important;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="content">
+            <div class="header">
+                <h1>Welcome, {{username}}!</h1>
+            </div>
+            <div class="body">
+                <p>Thanks for signing up!</p>
+                <p>To get started, please confirm your email address by clicking the button below</p>
+
+                <div class="button-container">
+                    <a href="{{link}}" class="button">Verify Email Address</a>
+                </div>
+
+                <p>If the button doesn't work, copy and paste the following link into your browser:</p>
+                <p style="word-break: break-all;"><a href="{{link}}">{{link}}</a></p>
+
+                <p>If you did not create an account, no further action is required</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

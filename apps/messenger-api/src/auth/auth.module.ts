@@ -6,6 +6,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { getJwtConfig } from '../config/jwt.config';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { EmailModule } from '../email/email.module';
+import { RefreshJwtGuard } from './guards/refresh-jwt.guard';
+import { TokenModule } from '../token/token.module';
 
 @Global()
 @Module({
@@ -14,10 +17,12 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
       useFactory: getJwtConfig,
       inject: [ConfigService],
     }),
+    EmailModule,
     UserModule,
+    TokenModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard],
+  providers: [AuthService, JwtAuthGuard, RefreshJwtGuard],
   exports: [JwtAuthGuard, JwtModule],
 })
 export class AuthModule {}

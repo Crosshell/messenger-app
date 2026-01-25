@@ -12,23 +12,30 @@ enum MessageStatus {
   FAILED
 }
 
+enum TokenType {
+  EMAIL
+  PASSWORD
+}
+
 model User {
-  id        String   @id @default(uuid(4))
-  username  String   @unique
-  email     String   @unique
-  password  String
-  avatarUrl String?  @map("avatar_url")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(uuid())
+  username        String   @unique
+  email           String   @unique
+  password        String
+  avatarUrl       String?  @map("avatar_url")
+  isEmailVerified Boolean  @default(false) @map("is_email_verified")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   chats    Chat[]    @relation("UserChats")
   messages Message[]
+  tokens   Token[]
 
   @@map("users")
 }
 
 model Chat {
-  id        String   @id @default(uuid(4))
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -39,7 +46,7 @@ model Chat {
 }
 
 model Message {
-  id        String        @id @default(uuid(4))
+  id        String        @id @default(uuid())
   content   String?
   isEdited  Boolean       @default(false) @map("is_edited")
   status    MessageStatus
@@ -69,4 +76,15 @@ model Attachment {
   messageId String  @map("message_id")
 
   @@map("attachments")
+}
+
+model Token {
+  value     String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String    @map("user_id")
+  type      TokenType
+  expiresAt DateTime  @map("expires_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@map("tokens")
 }

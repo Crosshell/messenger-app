@@ -13,6 +13,6 @@ export class UserController {
   async getMe(
     @CurrentUser('sub') userId: string,
   ): Promise<UserWithoutPassword> {
-    return this.service.findOneOrThrow(userId);
+    return this.service.findOneOrThrow({ id: userId });
   }
 }

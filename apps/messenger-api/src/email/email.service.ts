@@ -13,12 +13,17 @@ export class EmailService {
     this.clientBaseUrl = this.config.getOrThrow<string>('CLIENT_BASE_URL');
   }
 
-  async sendVerificationEmail(email: string, token: string): Promise<void> {
+  async sendVerificationEmail(
+    email: string,
+    username: string,
+    token: string,
+  ): Promise<void> {
     await this.mailer.sendMail({
       to: email,
       subject: 'Email Confirmation',
       template: 'verify-email',
       context: {
+        username,
         link: `${this.clientBaseUrl}/confirm?token=${token}`,
       },
     });
