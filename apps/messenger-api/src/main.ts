@@ -9,7 +9,7 @@ async function bootstrap() {
 
   const config = app.get(ConfigService);
 
-  const clientUrl = config.getOrThrow<string>('CLIENT_URL');
+  const clientUrl = config.getOrThrow<string>('CLIENT_BASE_URL');
 
   app.enableCors({
     origin: clientUrl,
