@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Lock, User } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { loginSchema, type LoginFormData } from '../../validators/login';
@@ -49,9 +49,12 @@ export const LoginPage = () => {
               error={errors.password?.message}
             />
             <div className="text-right">
-              <a href="#" className="text-xs text-blue-500 hover:text-blue-700">
+              <NavLink
+                to="#"
+                className="text-xs text-blue-500 hover:text-blue-700"
+              >
                 Forgot password?
-              </a>
+              </NavLink>
             </div>
           </div>
 
