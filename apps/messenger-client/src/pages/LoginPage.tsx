@@ -2,9 +2,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Lock, User } from 'lucide-react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
-import { loginSchema, type LoginFormData } from '../../validators/login';
+import { Input } from '../components/ui/Input.tsx';
+import { Button } from '../components/ui/Button.tsx';
+import { loginSchema, type LoginFormData } from '../validators/login.ts';
 
 export const LoginPage = () => {
   const {

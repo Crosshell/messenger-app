@@ -1,12 +1,12 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { User, Mail, Lock, LockKeyhole } from 'lucide-react';
-import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
+import { Input } from '../components/ui/Input.tsx';
+import { Button } from '../components/ui/Button.tsx';
 import {
   registerSchema,
   type RegisterFormData,
-} from '../../validators/register.ts';
+} from '../validators/register.ts';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 export const RegisterPage = () => {
