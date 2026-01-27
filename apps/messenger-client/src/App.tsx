@@ -4,6 +4,7 @@ import { LoginPage } from './pages/LoginPage.tsx';
 import { AuthLayout } from './components/layouts/AuthLayout.tsx';
 import { EmailVerificationPage } from './pages/EmailVerificationPage.tsx';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage.tsx';
+import { ResetPasswordPage } from './pages/ResetPasswordPage.tsx';
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/confirm" element={<EmailVerificationPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Route>
       </Routes>
