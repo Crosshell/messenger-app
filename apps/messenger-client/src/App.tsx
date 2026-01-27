@@ -11,7 +11,7 @@ export default function App() {
         <Route element={<AuthLayout />}>
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="confirm" element={<EmailVerificationPage />} />
+          <Route path="/confirm" element={<EmailVerificationPage />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Route>
       </Routes>

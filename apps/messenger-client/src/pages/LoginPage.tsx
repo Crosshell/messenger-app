@@ -38,6 +38,15 @@ export const LoginPage = () => {
         <p className="text-slate-400 mt-2">Please sign in to continue</p>
       </div>
 
+      {errors.root && (
+        <div
+          className="mb-4 p-3 bg-red-100 border border-red-200 text-red-700
+                     rounded-md text-sm flex items-center justify-center"
+        >
+          {errors.root.message}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <Input
           type="text"

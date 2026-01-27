@@ -72,7 +72,7 @@ export class AuthService {
 
     const isValid = user && (await verify(user.password, dto.password));
     if (!isValid) {
-      throw new UnauthorizedException('Invalid login or password');
+      throw new UnauthorizedException('Incorrect login or password');
     }
 
     if (!user.isEmailVerified) {
