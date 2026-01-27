@@ -15,7 +15,6 @@ import { TokenService } from '../token/token.service';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './types/jwt-payload.interface';
-import type { StringValue } from 'ms';
 import { ConfigService } from '@nestjs/config';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
@@ -139,7 +138,7 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const accessToken = await this.jwtService.signAsync(payload);
     const refreshToken = await this.jwtService.signAsync(payload, {
-      expiresIn: this.config.getOrThrow<StringValue>('jwt.refresh.expiresIn'),
+      expiresIn: this.config.getOrThrow<number>('jwt.refresh.expiresIn'),
       secret: this.config.getOrThrow<string>('jwt.refresh.secret'),
     });
 

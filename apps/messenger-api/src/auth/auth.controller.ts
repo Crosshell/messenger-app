@@ -24,13 +24,15 @@ import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  private readonly cookieConfig: CookieOptions;
+  private readonly cookieRefreshTokenConfig: CookieOptions;
 
   constructor(
     private readonly service: AuthService,
     private readonly config: ConfigService,
   ) {
-    this.cookieConfig = this.config.getOrThrow<CookieOptions>('cookie');
+    this.cookieRefreshTokenConfig = this.config.getOrThrow<CookieOptions>(
+      'cookie.refreshToken',
+    );
   }
 
   @Post('register')
@@ -64,7 +66,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
     const { refreshToken, accessToken } = await this.service.login(dto);
-    res.cookie('refreshToken', refreshToken, this.cookieConfig);
+    res.cookie('refreshToken', refreshToken, this.cookieRefreshTokenConfig);
     return { accessToken };
   }
 
@@ -76,7 +78,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
     const { refreshToken, accessToken } = await this.service.refresh(userId);
-    res.cookie('refreshToken', refreshToken, this.cookieConfig);
+    res.cookie('refreshToken', refreshToken, this.cookieRefreshTokenConfig);
     return { accessToken };
   }
 
