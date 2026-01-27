@@ -39,10 +39,7 @@ export const LoginPage = () => {
       </div>
 
       {errors.root && (
-        <div
-          className="mb-4 p-3 bg-red-100 border border-red-200 text-red-700
-                     rounded-md text-sm flex items-center justify-center"
-        >
+        <div className="mb-4 p-3 bg-red-100 border border-red-200 text-red-700 rounded-md text-sm flex items-center justify-center">
           {errors.root.message}
         </div>
       )}
@@ -78,6 +75,16 @@ export const LoginPage = () => {
           {isPending ? 'Signing in...' : 'Log In'}
         </Button>
       </form>
+
+      <div className="mt-4 text-center text-xs">
+        <span className="text-slate-400">Didn't receive confirmation? </span>
+        <Link
+          to="/resend-verification"
+          className="text-blue-500 hover:text-blue-700"
+        >
+          Resend email
+        </Link>
+      </div>
 
       <div className="mt-6 text-center text-sm text-slate-500">
         Don't have an account?{' '}
