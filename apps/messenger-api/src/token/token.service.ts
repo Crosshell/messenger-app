@@ -1,8 +1,7 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Token, TokenType } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
-import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class TokenService {
