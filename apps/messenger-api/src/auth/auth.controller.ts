@@ -3,9 +3,7 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
-  ParseUUIDPipe,
   Post,
-  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -21,6 +19,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ConfigService } from '@nestjs/config';
 import { RefreshToken } from './decorators/refresh-token.decorator';
+import { VerifyRegistrationDto } from './dto/verify-registration.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -44,9 +43,9 @@ export class AuthController {
   @Post('register/verify')
   @HttpCode(HttpStatus.OK)
   async verifyRegistration(
-    @Query('token', ParseUUIDPipe) token: string,
+    @Body() dto: VerifyRegistrationDto,
   ): Promise<MessageResponse> {
-    await this.service.verifyRegistration(token);
+    await this.service.verifyRegistration(dto);
     return { message: 'Registration verified successfully' };
   }
 

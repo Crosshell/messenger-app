@@ -16,6 +16,7 @@ import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { VerifyRegistrationDto } from './dto/verify-registration.dto';
 
 @Injectable()
 export class AuthService {
@@ -56,8 +57,8 @@ export class AuthService {
     );
   }
 
-  async verifyRegistration(tokenValue: string): Promise<void> {
-    const token = await this.tokenService.consume(tokenValue);
+  async verifyRegistration(dto: VerifyRegistrationDto): Promise<void> {
+    const token = await this.tokenService.consume(dto.token);
     if (!token) {
       throw new BadRequestException('Invalid or expired verification token');
     }

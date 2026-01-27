@@ -1,15 +1,19 @@
-import { RegisterPage } from './components/pages/RegisterPage.tsx';
+import { RegisterPage } from './pages/RegisterPage.tsx';
 import { Navigate, Routes, Route } from 'react-router-dom';
-import { LoginPage } from './components/pages/LoginPage.tsx';
+import { LoginPage } from './pages/LoginPage.tsx';
+import { AuthLayout } from './components/layouts/AuthLayout.tsx';
+import { EmailVerificationPage } from './pages/EmailVerificationPage.tsx';
 
 export default function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Navigate to="/register" replace />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/chat" element={<div>Chat</div>} />
+        <Route element={<AuthLayout />}>
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="confirm" element={<EmailVerificationPage />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Route>
       </Routes>
     </>
   );

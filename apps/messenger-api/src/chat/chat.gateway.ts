@@ -22,7 +22,7 @@ import { MessageService } from './message.service';
 import { WsJwtAuthGuard } from '../auth/guards/ws-jwt-auth.guard';
 import { CurrentWsUser } from '../auth/decorators/current-ws-user.decorator';
 
-@UsePipes(new ValidationPipe({ transform: true }))
+@UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 @WebSocketGateway({
   origin: process.env.CLIENT_BASE_URL || '*',
   credentials: true,
