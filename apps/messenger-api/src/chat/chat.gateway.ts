@@ -48,7 +48,7 @@ export class ChatGateway implements OnGatewayConnection {
 
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: this.config.getOrThrow('jwt.access.secret'),
+        secret: this.config.getOrThrow('jwt.secret'),
       });
 
       client.data.userId = payload.sub;

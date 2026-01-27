@@ -7,18 +7,9 @@ export default () => ({
     password: process.env.SMTP_PASSWORD,
   },
   jwt: {
-    access: {
-      secret: process.env.JWT_ACCESS_SECRET,
-      expiresIn:
-        process.env.JWT_ACCESS_EXPIRES_IN &&
-        parseInt(process.env.JWT_ACCESS_EXPIRES_IN),
-    },
-    refresh: {
-      secret: process.env.JWT_REFRESH_SECRET,
-      expiresIn:
-        process.env.JWT_REFRESH_EXPIRES_IN &&
-        parseInt(process.env.JWT_REFRESH_EXPIRES_IN),
-    },
+    secret: process.env.JWT_SECRET,
+    expiresIn:
+      process.env.JWT_EXPIRES_IN && parseInt(process.env.JWT_EXPIRES_IN),
   },
   cookie: {
     refreshToken: {
@@ -27,9 +18,9 @@ export default () => ({
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.COOKIE_SAME_SITE,
       path: '/',
-      expires:
-        process.env.JWT_REFRESH_EXPIRES_IN &&
-        new Date(Date.now() + process.env.JWT_REFRESH_EXPIRES_IN),
+      maxAge:
+        process.env.TOKEN_REFRESH_TTL &&
+        parseInt(process.env.TOKEN_REFRESH_TTL, 10),
     },
     secret: process.env.COOKIE_SECRET,
   },
@@ -39,5 +30,11 @@ export default () => ({
       parseInt(process.env.TOKEN_PASSWORD_TTL, 10),
     emailTtl:
       process.env.TOKEN_EMAIL_TTL && parseInt(process.env.TOKEN_EMAIL_TTL, 10),
+    refreshTtl:
+      process.env.TOKEN_REFRESH_TTL &&
+      parseInt(process.env.TOKEN_REFRESH_TTL, 10),
+    maxRefreshTokens:
+      process.env.MAX_REFRESH_TOKENS &&
+      parseInt(process.env.MAX_REFRESH_TOKENS, 10),
   },
 });

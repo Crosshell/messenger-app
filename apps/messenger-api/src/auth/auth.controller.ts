@@ -14,13 +14,13 @@ import { RegisterDto } from './dto/register.dto';
 import { MessageResponse } from '../common/responses/message.response';
 import { LoginDto } from './dto/login.dto';
 import type { CookieOptions, Response } from 'express';
-import { CurrentUser } from './decorators/current-user.decorator';
 import { Authorization } from './decorators/authorization.decorator';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { RefreshJwtGuard } from './guards/refresh-jwt.guard';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ConfigService } from '@nestjs/config';
+import { RefreshToken } from './decorators/refresh-token.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -74,10 +74,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(RefreshJwtGuard)
   async refresh(
-    @CurrentUser('sub') userId: string,
+    @RefreshToken() currentRefreshToken: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
-    const { refreshToken, accessToken } = await this.service.refresh(userId);
+    const { refreshToken, accessToken } =
+      await this.service.refresh(currentRefreshToken);
     res.cookie('refreshToken', refreshToken, this.cookieRefreshTokenConfig);
     return { accessToken };
   }

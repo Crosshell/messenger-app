@@ -9,7 +9,7 @@ import { JwtPayload } from '../types/jwt-payload.interface';
 export class WsJwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly config: ConfigService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -23,7 +23,7 @@ export class WsJwtAuthGuard implements CanActivate {
 
     try {
       client.data.user = await this.jwtService.verifyAsync<JwtPayload>(token, {
-        secret: this.configService.get<string>('jwt.access.secret'),
+        secret: this.config.getOrThrow<string>('jwt.secret'),
       });
 
       return true;

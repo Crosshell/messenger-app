@@ -9,6 +9,7 @@ datasource db {
 enum TokenType {
   EMAIL
   PASSWORD
+  REFRESH
 }
 
 enum ChatType {

@@ -14,8 +14,6 @@ import { TokenType } from '@prisma/client';
 import { TokenService } from '../token/token.service';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './types/jwt-payload.interface';
-import { ConfigService } from '@nestjs/config';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
@@ -26,7 +24,6 @@ export class AuthService {
     private readonly emailService: EmailService,
     private readonly tokenService: TokenService,
     private readonly jwtService: JwtService,
-    private readonly config: ConfigService,
   ) {}
 
   async register(dto: RegisterDto): Promise<void> {
@@ -81,17 +78,22 @@ export class AuthService {
       throw new ForbiddenException('Verify your email address first');
     }
 
-    return this.generateAuthTokens({ sub: user.id });
+    const accessToken = await this.jwtService.signAsync({ sub: user.id });
+    const refreshToken = await this.tokenService.createRefreshToken(user.id);
+
+    return { accessToken, refreshToken };
   }
 
   async refresh(
-    userId: string,
+    currentRefreshToken: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    const user = await this.userService.findOneOrThrow({ id: userId });
-    if (!user.isEmailVerified) {
-      throw new ForbiddenException('Verify your email address first');
-    }
-    return this.generateAuthTokens({ sub: user.id });
+    const newToken =
+      await this.tokenService.rotateRefreshToken(currentRefreshToken);
+
+    const accessToken = await this.jwtService.signAsync({
+      sub: newToken.userId,
+    });
+    return { accessToken, refreshToken: newToken.value };
   }
 
   async resendVerification(dto: ResendVerificationDto): Promise<void> {
@@ -131,17 +133,5 @@ export class AuthService {
     const hashedPassword = await hash(dto.password);
 
     await this.userService.updatePassword(data.userId, hashedPassword);
-  }
-
-  private async generateAuthTokens(
-    payload: JwtPayload,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    const accessToken = await this.jwtService.signAsync(payload);
-    const refreshToken = await this.jwtService.signAsync(payload, {
-      expiresIn: this.config.getOrThrow<number>('jwt.refresh.expiresIn'),
-      secret: this.config.getOrThrow<string>('jwt.refresh.secret'),
-    });
-
-    return { accessToken, refreshToken };
   }
 }
