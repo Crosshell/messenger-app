@@ -3,6 +3,7 @@ import { Navigate, Routes, Route } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage.tsx';
 import { AuthLayout } from './components/layouts/AuthLayout.tsx';
 import { EmailVerificationPage } from './pages/EmailVerificationPage.tsx';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage.tsx';
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/confirm" element={<EmailVerificationPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Route>
       </Routes>
