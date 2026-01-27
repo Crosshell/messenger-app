@@ -9,6 +9,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { EmailModule } from '../email/email.module';
 import { RefreshJwtGuard } from './guards/refresh-jwt.guard';
 import { TokenModule } from '../token/token.module';
+import { WsJwtAuthGuard } from './guards/ws-jwt-auth.guard';
 
 @Global()
 @Module({
@@ -22,7 +23,7 @@ import { TokenModule } from '../token/token.module';
     TokenModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard, RefreshJwtGuard],
-  exports: [JwtAuthGuard, JwtModule],
+  providers: [AuthService, JwtAuthGuard, RefreshJwtGuard, WsJwtAuthGuard],
+  exports: [JwtAuthGuard, JwtModule, WsJwtAuthGuard],
 })
 export class AuthModule {}

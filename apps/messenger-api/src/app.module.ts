@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EmailModule } from './email/email.module';
 import { TokenModule } from './token/token.module';
 import config from './config/config';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import config from './config/config';
     PrismaModule,
     EmailModule,
     TokenModule,
+    ChatModule,
   ],
 })
 export class AppModule {}
