@@ -1,5 +1,5 @@
 import { authService } from '../services/auth.service';
-import type { ApiErrorResponse } from '../types/api';
+import type { ApiErrorResponse } from '../types/responses/error.response.ts';
 import { useQuery } from '@tanstack/react-query';
 
 export const useVerifyEmail = (token: string) => {
