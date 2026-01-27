@@ -5,21 +5,24 @@ import type { ApiErrorResponse } from '../types/responses/error.response';
 import type {
   ResetPasswordFormData,
   ResetPasswordPayload,
-} from '../validators/resetPassword';
+} from '../validators/reset-password.validator.ts';
+import type { AxiosError } from 'axios';
+import { handleApiError } from '../utils/api-error.util.ts';
+import type { MessageResponse } from '../types/responses/message.response.ts';
 
 interface UseResetPasswordProps {
   setError: UseFormSetError<ResetPasswordFormData>;
 }
 
 export const useResetPassword = ({ setError }: UseResetPasswordProps) => {
-  return useMutation<any, ApiErrorResponse, ResetPasswordPayload>({
+  return useMutation<
+    MessageResponse,
+    AxiosError<ApiErrorResponse>,
+    ResetPasswordPayload
+  >({
     mutationFn: authService.resetPassword,
-    onError: (error: ApiErrorResponse) => {
-      if (typeof error.message === 'string') {
-        setError('root', { type: 'server', message: error.message });
-      } else if (Array.isArray(error.message)) {
-        setError('root', { type: 'server', message: error.message[0] });
-      }
+    onError: (error: AxiosError<ApiErrorResponse>) => {
+      handleApiError(error, setError);
     },
   });
 };

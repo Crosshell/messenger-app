@@ -7,8 +7,8 @@ import { Button } from '../components/ui/Button.tsx';
 import {
   resendVerificationSchema,
   type ResendVerificationFormData,
-} from '../validators/resend-verification.ts';
-import { useResendVerification } from '../hooks/useResendVerification.ts';
+} from '../validators/resend-verification.validator.ts';
+import { useResendVerification } from '../hooks/use-resend-verification.ts';
 
 export const ResendVerificationPage = () => {
   const {

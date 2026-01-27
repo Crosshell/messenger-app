@@ -7,8 +7,8 @@ import { Button } from '../components/ui/Button.tsx';
 import {
   forgotPasswordSchema,
   type ForgotPasswordFormData,
-} from '../validators/forgotPassword.ts';
-import { useForgotPassword } from '../hooks/useForgotPassword.ts';
+} from '../validators/forgot-password.validator.ts';
+import { useForgotPassword } from '../hooks/use-forgot-password.ts';
 
 export const ForgotPasswordPage = () => {
   const {

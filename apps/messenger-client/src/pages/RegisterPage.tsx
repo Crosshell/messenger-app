@@ -6,9 +6,9 @@ import { Button } from '../components/ui/Button.tsx';
 import {
   registerSchema,
   type RegisterFormData,
-} from '../validators/register.ts';
+} from '../validators/register.validator.ts';
 import { NavLink } from 'react-router-dom';
-import { useRegister } from '../hooks/useRegister.ts';
+import { useRegister } from '../hooks/use-register.ts';
 
 export const RegisterPage = () => {
   const {
@@ -58,7 +58,7 @@ export const RegisterPage = () => {
       </div>
 
       {errors.root && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm text-center">
           {errors.root.message}
         </div>
       )}

@@ -2,9 +2,11 @@ import { useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import type { UseFormSetError } from 'react-hook-form';
 import type { ApiErrorResponse } from '../types/responses/error.response.ts';
-import type { LoginFormData } from '../validators/login.ts';
+import type { LoginFormData } from '../validators/login.validator.ts';
 import { useAuthStore } from '../store/auth.store.ts';
 import type { LoginResponse } from '../types/responses/login.response.ts';
+import { handleApiError } from '../utils/api-error.util.ts';
+import type { AxiosError } from 'axios';
 
 interface UseLoginProps {
   setError: UseFormSetError<LoginFormData>;
@@ -14,18 +16,18 @@ interface UseLoginProps {
 export const useLogin = ({ setError, onSuccess }: UseLoginProps) => {
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
 
-  return useMutation<LoginResponse, ApiErrorResponse, LoginFormData>({
+  return useMutation<
+    LoginResponse,
+    AxiosError<ApiErrorResponse>,
+    LoginFormData
+  >({
     mutationFn: authService.login,
     onSuccess: (data) => {
       setAccessToken(data.accessToken);
       onSuccess?.();
     },
-    onError: (error: ApiErrorResponse) => {
-      if (typeof error.message === 'string') {
-        setError('root', { type: 'server', message: error.message });
-      } else if (Array.isArray(error.message)) {
-        setError('root', { type: 'server', message: error.message[0] });
-      }
+    onError: (error: AxiosError<ApiErrorResponse>) => {
+      handleApiError(error, setError);
     },
   });
 };

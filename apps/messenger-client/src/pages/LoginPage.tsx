@@ -4,8 +4,11 @@ import { Lock, User } from 'lucide-react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Input } from '../components/ui/Input.tsx';
 import { Button } from '../components/ui/Button.tsx';
-import { loginSchema, type LoginFormData } from '../validators/login.ts';
-import { useLogin } from '../hooks/useLogin.ts';
+import {
+  loginSchema,
+  type LoginFormData,
+} from '../validators/login.validator.ts';
+import { useLogin } from '../hooks/use-login.ts';
 
 export const LoginPage = () => {
   const {

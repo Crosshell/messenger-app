@@ -1,5 +1,5 @@
 import { Link, useSearchParams } from 'react-router-dom';
-import { useVerifyEmail } from '../hooks/useVerifyEmail.ts';
+import { useVerifyEmail } from '../hooks/use-verify-email.ts';
 import { Button } from '../components/ui/Button.tsx';
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
 

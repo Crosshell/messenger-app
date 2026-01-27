@@ -4,11 +4,11 @@ import { Lock, LockKeyhole, CheckCircle2, XCircle } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Input } from '../components/ui/Input.tsx';
 import { Button } from '../components/ui/Button.tsx';
-import { useResetPassword } from '../hooks/useResetPassword.ts';
+import { useResetPassword } from '../hooks/use-reset-password.ts';
 import {
   type ResetPasswordFormData,
   resetPasswordSchema,
-} from '../validators/resetPassword.ts';
+} from '../validators/reset-password.validator.ts';
 
 export const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();
