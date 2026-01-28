@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 import { UserWithoutPassword } from './types/user-without-password.type';
+import { FindManyUsersDto } from './dto/find-many-users.dto';
 
 @Injectable()
 export class UserService {
@@ -58,5 +59,13 @@ export class UserService {
   ): Promise<void> {
     await this.findOneOrThrow(where);
     await this.prisma.user.update({ where, data, omit: { password: true } });
+  }
+
+  async findMany(dto: FindManyUsersDto): Promise<UserWithoutPassword[]> {
+    return this.prisma.user.findMany({
+      where: {
+        username: { contains: dto.username },
+      },
+    });
   }
 }

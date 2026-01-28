@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Chat, ChatType } from '@prisma/client';
+import { Chat, ChatType, Message } from '@prisma/client';
 
 @Injectable()
 export class ChatService {
@@ -46,21 +46,50 @@ export class ChatService {
     });
   }
 
-  async getUserChats(userId: string): Promise<Chat[]> {
-    return this.prisma.chat.findMany({
+  async getUserChats(userId: string) {
+    const chats = await this.prisma.chat.findMany({
       where: { members: { some: { userId } } },
       orderBy: { lastMessageAt: 'desc' },
       include: {
-        members: {
-          include: {
-            user: { select: { id: true, username: true, avatarUrl: true } },
-          },
-        },
+        ...this.includeMembers,
         messages: {
           take: 1,
           orderBy: { createdAt: 'desc' },
         },
+        _count: {
+          select: {
+            messages: {
+              where: {
+                isRead: false,
+                senderId: { not: userId },
+              },
+            },
+          },
+        },
       },
+    });
+
+    return chats.map((chat) => ({
+      ...chat,
+      unreadCount: chat._count.messages,
+      _count: undefined,
+    }));
+  }
+
+  async getChatMessages(chatId: string): Promise<Message[]> {
+    return this.prisma.message.findMany({
+      where: { chatId },
+      include: {
+        sender: { select: { id: true, username: true, avatarUrl: true } },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  async getChatMembers(chatId: string) {
+    return this.prisma.chatMember.findMany({
+      where: { chatId },
+      select: { userId: true },
     });
   }
 }

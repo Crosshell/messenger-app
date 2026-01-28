@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Token, TokenType } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
@@ -87,9 +87,16 @@ export class TokenService {
     const expiresAt = new Date(Date.now() + this.getTtl(TokenType.REFRESH));
 
     return this.prisma.$transaction(async (tx) => {
-      const deletedToken = await tx.token.delete({
-        where: { value: oldTokenValue },
-      });
+      const deletedToken = await tx.token
+        .delete({
+          where: { value: oldTokenValue },
+        })
+        .catch((e) => {
+          if (e.code === 'P2025') {
+            throw new UnauthorizedException('Invalid or expired refresh token');
+          }
+          throw e;
+        });
 
       return tx.token.create({
         data: {

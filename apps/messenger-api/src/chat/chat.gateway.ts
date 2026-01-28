@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import {
   WebSocketGateway,
   SubscribeMessage,
@@ -21,11 +22,15 @@ import { WsExceptionFilter } from '../common/filters/ws-exception.filter';
 import { MessageService } from './message.service';
 import { WsJwtAuthGuard } from '../auth/guards/ws-jwt-auth.guard';
 import { CurrentWsUser } from '../auth/decorators/current-ws-user.decorator';
+import { ChatService } from './chat.service';
+import { MarkReadDto } from './dto/mark-read.dto';
 
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 @WebSocketGateway({
-  origin: process.env.CLIENT_BASE_URL || '*',
-  credentials: true,
+  cors: {
+    origin: process.env.CLIENT_BASE_URL,
+    credentials: true,
+  },
 })
 @UseFilters(WsExceptionFilter)
 @UseGuards(WsJwtAuthGuard)
@@ -37,6 +42,7 @@ export class ChatGateway implements OnGatewayConnection {
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
     private readonly messageService: MessageService,
+    private readonly chatService: ChatService,
   ) {}
 
   async handleConnection(client: Socket): Promise<void> {
@@ -76,6 +82,11 @@ export class ChatGateway implements OnGatewayConnection {
   ): Promise<void> {
     const message = await this.messageService.saveMessage(userId, dto);
     this.server.to(`chat_${dto.chatId}`).emit('newMessage', message);
+
+    const chatMembers = await this.chatService.getChatMembers(dto.chatId);
+    const userRooms = chatMembers.map((member) => `user_${member.userId}`);
+
+    this.server.to(userRooms).emit('chatListUpdate', message);
   }
 
   @SubscribeMessage('editMessage')
@@ -96,6 +107,22 @@ export class ChatGateway implements OnGatewayConnection {
     this.server
       .to(`chat_${payload.chatId}`)
       .emit('messageDeleted', { messageId: payload.messageId });
+  }
+
+  @SubscribeMessage('markAsRead')
+  async handleMarkAsRead(
+    @CurrentWsUser('sub') userId: string,
+    @MessageBody() dto: MarkReadDto,
+  ): Promise<void> {
+    const readUntil = await this.messageService.markAsRead(userId, dto);
+
+    if (!readUntil) return;
+
+    this.server.to(`chat_${dto.chatId}`).emit('messagesRead', {
+      chatId: dto.chatId,
+      readerId: userId,
+      readAt: readUntil.toISOString(),
+    });
   }
 
   private extractToken(client: Socket): string | undefined {

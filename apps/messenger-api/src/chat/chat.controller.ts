@@ -4,13 +4,15 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseUUIDPipe,
   Post,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { Authorization } from '../auth/decorators/authorization.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateChatDto } from './dto/create-chat.dto';
-import { Chat } from '@prisma/client';
+import { Chat, Message } from '@prisma/client';
 
 @Controller('chats')
 @Authorization()
@@ -27,7 +29,14 @@ export class ChatController {
   }
 
   @Get()
-  async getChats(@CurrentUser('sub') currentUserId: string): Promise<Chat[]> {
+  async getChats(@CurrentUser('sub') currentUserId: string) {
     return this.service.getUserChats(currentUserId);
+  }
+
+  @Get(':chatId/messages')
+  async getChatMessages(
+    @Param('chatId', ParseUUIDPipe) chatId: string,
+  ): Promise<Message[]> {
+    return this.service.getChatMessages(chatId);
   }
 }

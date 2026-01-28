@@ -6,6 +6,8 @@ import { EmailVerificationPage } from './pages/EmailVerificationPage.tsx';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage.tsx';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.tsx';
 import { ResendVerificationPage } from './pages/ResendVerificationPage.tsx';
+import { ChatPage } from './pages/ChatPage.tsx';
+import { ProtectedRoute } from './components/routes/ProtectedRoute.tsx';
 
 export default function App() {
   return (
@@ -21,8 +23,11 @@ export default function App() {
             path="/resend-verification"
             element={<ResendVerificationPage />}
           />
-          <Route path="*" element={<Navigate to="/login" replace />} />
         </Route>
+        <Route element={<ProtectedRoute />}>
+          <Route path="/chat" element={<ChatPage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </>
   );
