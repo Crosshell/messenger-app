@@ -1,14 +1,14 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { User, Mail, Lock, LockKeyhole } from 'lucide-react';
-import { Input } from '../components/ui/Input.tsx';
-import { Button } from '../components/ui/Button.tsx';
+import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
 import {
   registerSchema,
   type RegisterFormData,
-} from '../validators/register.validator.ts';
+} from '../validators/register.validator';
 import { NavLink } from 'react-router-dom';
-import { useRegister } from '../hooks/use-register.ts';
+import { useRegister } from '../hooks/use-register';
 
 export const RegisterPage = () => {
   const {

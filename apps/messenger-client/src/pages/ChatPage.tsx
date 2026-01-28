@@ -1,6 +1,6 @@
-import { LeftSidebar } from '../components/chat/Sidebar/LeftSidebar.tsx';
+import { LeftSidebar } from '../components/chat/Sidebar/LeftSidebar';
 import { ActiveChat } from '../components/chat/ActiveChat';
-import { useChatEvents } from '../hooks/use-chat-events.ts';
+import { useChatEvents } from '../hooks/use-chat-events';
 
 export const ChatPage = () => {
   useChatEvents();

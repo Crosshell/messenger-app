@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { ChatHeader } from './ChatHeader.tsx';
-import { ChatSidebarSearch } from './ChatSidebarSearch.tsx';
-import { ChatList } from './ChatList.tsx';
+import { ChatHeader } from './ChatHeader';
+import { ChatSidebarSearch } from './ChatSidebarSearch';
+import { ChatList } from './ChatList';
 
 export const LeftSidebar = () => {
   const [searchQuery, setSearchQuery] = useState('');

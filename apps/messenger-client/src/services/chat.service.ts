@@ -1,5 +1,5 @@
-import type { Chat } from '../types/chat.type.ts';
-import { api } from '../api/axios.ts';
+import type { Chat } from '../types/chat.type';
+import { api } from '../api/axios';
 
 export const chatService = {
   async getUserChats(): Promise<Chat[]> {

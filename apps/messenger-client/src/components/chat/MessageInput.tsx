@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
 import { Send, Paperclip, Smile, X, Check } from 'lucide-react';
-import { useSendMessage } from '../../hooks/use-send-message.ts';
-import { useChatStore } from '../../store/chat.store.ts';
-import { useMessageActions } from '../../hooks/use-message-actions.ts';
+import { useSendMessage } from '../../hooks/use-send-message';
+import { useChatStore } from '../../store/chat.store';
+import { useMessageActions } from '../../hooks/use-message-actions';
 
 interface MessageInputProps {
   chatId: string;

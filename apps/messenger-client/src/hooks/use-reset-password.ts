@@ -5,10 +5,10 @@ import type { ApiErrorResponse } from '../types/responses/error.response';
 import type {
   ResetPasswordFormData,
   ResetPasswordPayload,
-} from '../validators/reset-password.validator.ts';
+} from '../validators/reset-password.validator';
 import type { AxiosError } from 'axios';
-import { handleApiError } from '../utils/api-error.util.ts';
-import type { MessageResponse } from '../types/responses/message.response.ts';
+import { handleApiError } from '../utils/api-error.util';
+import type { MessageResponse } from '../types/responses/message.response';
 
 interface UseResetPasswordProps {
   setError: UseFormSetError<ResetPasswordFormData>;

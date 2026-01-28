@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Message } from '../types/message.type.ts';
+import type { Message } from '../types/message.type';
 
 interface ChatState {
   activeChatId: string | null;

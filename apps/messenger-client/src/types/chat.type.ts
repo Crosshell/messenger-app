@@ -1,5 +1,5 @@
-import type { User } from './user.type.ts';
-import type { Message } from './message.type.ts';
+import type { User } from './user.type';
+import type { Message } from './message.type';
 
 export interface ChatMember {
   user: User;

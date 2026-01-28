@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import type { UseFormSetError } from 'react-hook-form';
-import type { RegisterFormData } from '../validators/register.validator.ts';
-import type { ApiErrorResponse } from '../types/responses/error.response.ts';
+import type { RegisterFormData } from '../validators/register.validator';
+import type { ApiErrorResponse } from '../types/responses/error.response';
 import type { AxiosError } from 'axios';
-import { handleApiError } from '../utils/api-error.util.ts';
-import type { MessageResponse } from '../types/responses/message.response.ts';
+import { handleApiError } from '../utils/api-error.util';
+import type { MessageResponse } from '../types/responses/message.response';
 
 interface UseRegisterProps {
   setError: UseFormSetError<RegisterFormData>;

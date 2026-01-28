@@ -1,5 +1,5 @@
 import { Search, X } from 'lucide-react';
-import { Input } from '../../ui/Input.tsx';
+import { Input } from '../../ui/Input';
 
 interface ChatSidebarSearchProps {
   value: string;

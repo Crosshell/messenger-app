@@ -1,6 +1,6 @@
 import type { Chat } from '../types/chat.type';
 import type { Message } from '../types/message.type';
-import type { MessageDeletedResponse } from '../types/responses/message-deleted.response.ts';
+import type { MessageDeletedResponse } from '../types/responses/message-deleted.response';
 
 interface UpdateReadStatusParams {
   chatId: string;

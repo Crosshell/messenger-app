@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { messageService } from '../../services/message.service';
 import { MessageBubble } from './MessageBubble';
-import { useAutoRead } from '../../hooks/use-auto-read.ts';
-import { useChatSubscription } from '../../hooks/use-chat-subscription.ts';
+import { useAutoRead } from '../../hooks/use-auto-read';
+import { useChatSubscription } from '../../hooks/use-chat-subscription';
 
 interface MessageListProps {
   chatId: string;

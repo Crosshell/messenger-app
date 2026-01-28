@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { LogOut, Plus, MessageSquare } from 'lucide-react';
-import { useAuthStore } from '../../../store/auth.store.ts';
-import { CreateChatModal } from '../../modals/CreateChatModal.tsx';
+import { useAuthStore } from '../../../store/auth.store';
+import { CreateChatModal } from '../../modals/CreateChatModal';
 import { useNavigate } from 'react-router-dom';
 
 export const ChatHeader = () => {

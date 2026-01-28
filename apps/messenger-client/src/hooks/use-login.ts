@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import type { UseFormSetError } from 'react-hook-form';
-import type { ApiErrorResponse } from '../types/responses/error.response.ts';
-import type { LoginFormData } from '../validators/login.validator.ts';
-import { useAuthStore } from '../store/auth.store.ts';
-import type { LoginResponse } from '../types/responses/login.response.ts';
-import { handleApiError } from '../utils/api-error.util.ts';
+import type { ApiErrorResponse } from '../types/responses/error.response';
+import type { LoginFormData } from '../validators/login.validator';
+import { useAuthStore } from '../store/auth.store';
+import type { LoginResponse } from '../types/responses/login.response';
+import { handleApiError } from '../utils/api-error.util';
 import type { AxiosError } from 'axios';
 
 interface UseLoginProps {

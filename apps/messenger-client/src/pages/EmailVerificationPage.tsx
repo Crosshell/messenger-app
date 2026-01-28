@@ -1,6 +1,6 @@
 import { Link, useSearchParams } from 'react-router-dom';
-import { useVerifyEmail } from '../hooks/use-verify-email.ts';
-import { Button } from '../components/ui/Button.tsx';
+import { useVerifyEmail } from '../hooks/use-verify-email';
+import { Button } from '../components/ui/Button';
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
 
 export const EmailVerificationPage = () => {

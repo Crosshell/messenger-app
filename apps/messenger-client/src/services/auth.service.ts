@@ -1,11 +1,11 @@
-import type { RegisterFormData } from '../validators/register.validator.ts';
-import type { LoginFormData } from '../validators/login.validator.ts';
-import type { LoginResponse } from '../types/responses/login.response.ts';
-import type { ForgotPasswordFormData } from '../validators/forgot-password.validator.ts';
-import type { ResetPasswordPayload } from '../validators/reset-password.validator.ts';
-import type { ResendVerificationFormData } from '../validators/resend-verification.validator.ts';
-import { api } from '../api/axios.ts';
-import type { MessageResponse } from '../types/responses/message.response.ts';
+import type { RegisterFormData } from '../validators/register.validator';
+import type { LoginFormData } from '../validators/login.validator';
+import type { LoginResponse } from '../types/responses/login.response';
+import type { ForgotPasswordFormData } from '../validators/forgot-password.validator';
+import type { ResetPasswordPayload } from '../validators/reset-password.validator';
+import type { ResendVerificationFormData } from '../validators/resend-verification.validator';
+import { api } from '../api/axios';
+import type { MessageResponse } from '../types/responses/message.response';
 
 export const authService = {
   async register(data: RegisterFormData) {

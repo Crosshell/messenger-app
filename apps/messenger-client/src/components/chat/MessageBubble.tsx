@@ -4,7 +4,7 @@ import { useAuthStore } from '../../store/auth.store';
 import type { Message } from '../../types/message.type';
 import { Check, CheckCheck, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { useChatStore } from '../../store/chat.store';
-import { useMessageActions } from '../../hooks/use-message-actions.ts';
+import { useMessageActions } from '../../hooks/use-message-actions';
 
 interface MessageBubbleProps {
   message: Message;

@@ -1,6 +1,5 @@
-import type { User } from '../types/user.type.ts';
-
-import { api } from '../api/axios.ts';
+import type { User } from '../types/user.type';
+import { api } from '../api/axios';
 
 export const userService = {
   async searchUsers(username: string): Promise<User[]> {

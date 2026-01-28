@@ -2,13 +2,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Lock, LockKeyhole, CheckCircle2, XCircle } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Input } from '../components/ui/Input.tsx';
-import { Button } from '../components/ui/Button.tsx';
-import { useResetPassword } from '../hooks/use-reset-password.ts';
+import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
+import { useResetPassword } from '../hooks/use-reset-password';
 import {
   type ResetPasswordFormData,
   resetPasswordSchema,
-} from '../validators/reset-password.validator.ts';
+} from '../validators/reset-password.validator';
 
 export const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();

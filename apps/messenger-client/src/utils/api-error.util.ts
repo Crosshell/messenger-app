@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import type { UseFormSetError } from 'react-hook-form';
-import type { ApiErrorResponse } from '../types/responses/error.response.ts';
+import type { ApiErrorResponse } from '../types/responses/error.response';
 
 export const handleApiError = <T extends Record<string, any>>(
   error: AxiosError<ApiErrorResponse>,

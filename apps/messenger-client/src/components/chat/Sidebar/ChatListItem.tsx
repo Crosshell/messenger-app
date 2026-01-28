@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { Check, CheckCheck, User as UserIcon } from 'lucide-react';
-import type { Chat } from '../../../types/chat.type.ts';
-import { useAuthStore } from '../../../store/auth.store.ts';
-import { useChatStore } from '../../../store/chat.store.ts';
-import { formatMessageDate } from '../../../utils/date.util.ts';
+import type { Chat } from '../../../types/chat.type';
+import { useAuthStore } from '../../../store/auth.store';
+import { useChatStore } from '../../../store/chat.store';
+import { formatMessageDate } from '../../../utils/date.util';
 
 interface ChatListItemProps {
   chat: Chat;

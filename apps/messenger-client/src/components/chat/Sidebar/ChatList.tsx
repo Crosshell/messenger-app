@@ -1,7 +1,7 @@
 import { Loader2, SearchX } from 'lucide-react';
-import { useChatList } from '../../../hooks/use-chat-list.ts';
-import { ChatListItem } from './ChatListItem.tsx';
-import { useAuthStore } from '../../../store/auth.store.ts';
+import { useChatList } from '../../../hooks/use-chat-list';
+import { ChatListItem } from './ChatListItem';
+import { useAuthStore } from '../../../store/auth.store';
 import { useMemo } from 'react';
 
 interface ChatListProps {

@@ -2,13 +2,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Mail, ArrowLeft, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Input } from '../components/ui/Input.tsx';
-import { Button } from '../components/ui/Button.tsx';
+import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
 import {
   resendVerificationSchema,
   type ResendVerificationFormData,
-} from '../validators/resend-verification.validator.ts';
-import { useResendVerification } from '../hooks/use-resend-verification.ts';
+} from '../validators/resend-verification.validator';
+import { useResendVerification } from '../hooks/use-resend-verification';
 
 export const ResendVerificationPage = () => {
   const {

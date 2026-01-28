@@ -1,13 +1,13 @@
-import { RegisterPage } from './pages/RegisterPage.tsx';
+import { RegisterPage } from './pages/RegisterPage';
 import { Navigate, Routes, Route } from 'react-router-dom';
-import { LoginPage } from './pages/LoginPage.tsx';
-import { AuthLayout } from './components/layouts/AuthLayout.tsx';
-import { EmailVerificationPage } from './pages/EmailVerificationPage.tsx';
-import { ForgotPasswordPage } from './pages/ForgotPasswordPage.tsx';
-import { ResetPasswordPage } from './pages/ResetPasswordPage.tsx';
-import { ResendVerificationPage } from './pages/ResendVerificationPage.tsx';
-import { ChatPage } from './pages/ChatPage.tsx';
-import { ProtectedRoute } from './components/routes/ProtectedRoute.tsx';
+import { LoginPage } from './pages/LoginPage';
+import { AuthLayout } from './components/layouts/AuthLayout';
+import { EmailVerificationPage } from './pages/EmailVerificationPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { ResendVerificationPage } from './pages/ResendVerificationPage';
+import { ChatPage } from './pages/ChatPage';
+import { ProtectedRoute } from './components/routes/ProtectedRoute';
 
 export default function App() {
   return (

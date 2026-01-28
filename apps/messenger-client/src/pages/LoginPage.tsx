@@ -2,8 +2,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Lock, User } from 'lucide-react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Input } from '../components/ui/Input.tsx';
-import { Button } from '../components/ui/Button.tsx';
+import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
 import {
   loginSchema,
   type LoginFormData,
