@@ -1,5 +1,6 @@
 import type { Chat } from '../types/chat.type';
 import type { Message } from '../types/message.type';
+import type { MessageDeletedResponse } from '../types/responses/message-deleted.response.ts';
 
 interface UpdateReadStatusParams {
   chatId: string;
@@ -86,6 +87,78 @@ export const updateChatListReadStatus = (
           messages: [{ ...lastMsg, isRead: true }],
         };
       }
+    }
+
+    return chat;
+  });
+};
+
+export const updateMessageOnEdit = (
+  oldMessages: Message[] | undefined,
+  updatedMessage: Message,
+): Message[] | undefined => {
+  if (!oldMessages) return oldMessages;
+  return oldMessages.map((msg) =>
+    msg.id === updatedMessage.id ? updatedMessage : msg,
+  );
+};
+
+export const removeMessageOnDelete = (
+  oldMessages: Message[] | undefined,
+  messageId: string,
+): Message[] | undefined => {
+  if (!oldMessages) return oldMessages;
+  return oldMessages.filter((msg) => msg.id !== messageId);
+};
+
+export const updateChatListOnEdit = (
+  oldChats: Chat[] | undefined,
+  updatedMessage: Message,
+): Chat[] | undefined => {
+  if (!oldChats) return oldChats;
+
+  return oldChats.map((chat) => {
+    if (chat.id !== updatedMessage.chatId) return chat;
+
+    const lastMsg = chat.messages?.[0];
+    if (lastMsg && lastMsg.id === updatedMessage.id) {
+      return {
+        ...chat,
+        messages: [updatedMessage],
+      };
+    }
+
+    return chat;
+  });
+};
+
+export const shouldRefetchChatsOnDelete = (
+  oldChats: Chat[] | undefined,
+  messageId: string,
+): boolean => {
+  if (!oldChats) return false;
+
+  return oldChats.some((chat) => chat.messages?.[0]?.id === messageId);
+};
+
+export const updateUnreadCountOnDelete = (
+  oldChats: Chat[] | undefined,
+  event: MessageDeletedResponse,
+  currentUserId: string | null,
+): Chat[] | undefined => {
+  if (!oldChats) return oldChats;
+
+  return oldChats.map((chat) => {
+    if (chat.id !== event.chatId) return chat;
+
+    const shouldDecrement =
+      event.senderId !== currentUserId && !event.isRead && chat.unreadCount > 0;
+
+    if (shouldDecrement) {
+      return {
+        ...chat,
+        unreadCount: chat.unreadCount - 1,
+      };
     }
 
     return chat;

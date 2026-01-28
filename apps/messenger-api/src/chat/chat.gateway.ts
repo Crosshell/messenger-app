@@ -95,7 +95,11 @@ export class ChatGateway implements OnGatewayConnection {
     @MessageBody() dto: EditMessageDto,
   ): Promise<void> {
     const updatedMessage = await this.messageService.editMessage(userId, dto);
-    this.server.to(`chat_${dto.chatId}`).emit('messageUpdated', updatedMessage);
+    const chatMembers = await this.chatService.getChatMembers(dto.chatId);
+
+    const userRooms = chatMembers.map((member) => `user_${member.userId}`);
+
+    this.server.to(userRooms).emit('messageUpdated', updatedMessage);
   }
 
   @SubscribeMessage('deleteMessage')
@@ -103,10 +107,20 @@ export class ChatGateway implements OnGatewayConnection {
     @CurrentWsUser('sub') userId: string,
     @MessageBody() payload: { chatId: string; messageId: string },
   ): Promise<void> {
-    await this.messageService.deleteMessage(userId, payload.messageId);
-    this.server
-      .to(`chat_${payload.chatId}`)
-      .emit('messageDeleted', { messageId: payload.messageId });
+    const deletedMessage = await this.messageService.deleteMessage(
+      userId,
+      payload.messageId,
+    );
+
+    const chatMembers = await this.chatService.getChatMembers(payload.chatId);
+    const userRooms = chatMembers.map((member) => `user_${member.userId}`);
+
+    this.server.to(userRooms).emit('messageDeleted', {
+      messageId: payload.messageId,
+      chatId: payload.chatId,
+      senderId: deletedMessage.senderId,
+      isRead: deletedMessage.isRead,
+    });
   }
 
   @SubscribeMessage('markAsRead')

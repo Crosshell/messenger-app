@@ -5,12 +5,18 @@ import { useAuthStore } from '../store/auth.store';
 import { useChatStore } from '../store/chat.store';
 import type { Message } from '../types/message.type';
 import type { Chat } from '../types/chat.type';
-import type { MessagesReadResponse } from '../types/responses/messages-read.response.ts';
+import type { MessagesReadResponse } from '../types/responses/messages-read.response';
 import {
   updateChatListOnNewMessage,
   updateChatListReadStatus,
   updateMessagesOnRead,
+  updateMessageOnEdit,
+  removeMessageOnDelete,
+  updateChatListOnEdit,
+  updateUnreadCountOnDelete,
+  shouldRefetchChatsOnDelete,
 } from '../utils/chat-cache-updaters';
+import type { MessageDeletedResponse } from '../types/responses/message-deleted.response.ts';
 
 export const useChatEvents = () => {
   const socket = useSocket();
@@ -29,12 +35,10 @@ export const useChatEvents = () => {
           currentUserId,
           activeChatId,
         );
-
         if (updated === undefined && oldChats) {
           queryClient.invalidateQueries({ queryKey: ['chats'] });
           return oldChats;
         }
-
         return updated;
       });
     };
@@ -47,12 +51,12 @@ export const useChatEvents = () => {
       const readUntilTimestamp = new Date(readAt).getTime();
       if (isNaN(readUntilTimestamp)) return;
 
-      queryClient.setQueryData<Message[]>(['messages', chatId], (oldMessages) =>
-        updateMessagesOnRead(oldMessages, readUntilTimestamp),
+      queryClient.setQueryData<Message[]>(['messages', chatId], (old) =>
+        updateMessagesOnRead(old, readUntilTimestamp),
       );
 
-      queryClient.setQueryData<Chat[]>(['chats'], (oldChats) =>
-        updateChatListReadStatus(oldChats, {
+      queryClient.setQueryData<Chat[]>(['chats'], (old) =>
+        updateChatListReadStatus(old, {
           chatId,
           readerId,
           currentUserId,
@@ -61,12 +65,53 @@ export const useChatEvents = () => {
       );
     };
 
+    const handleMessageUpdated = (updatedMessage: Message) => {
+      queryClient.setQueryData<Message[]>(
+        ['messages', updatedMessage.chatId],
+        (old) => updateMessageOnEdit(old, updatedMessage),
+      );
+
+      queryClient.setQueryData<Chat[]>(['chats'], (old) =>
+        updateChatListOnEdit(old, updatedMessage),
+      );
+    };
+
+    const handleMessageDeleted = (payload: MessageDeletedResponse) => {
+      if (activeChatId === payload.chatId) {
+        queryClient.setQueryData<Message[]>(
+          ['messages', payload.chatId],
+          (old) => removeMessageOnDelete(old, payload.messageId),
+        );
+      }
+
+      queryClient.setQueryData<Chat[]>(['chats'], (oldChats) => {
+        const chatsWithUpdatedCount = updateUnreadCountOnDelete(
+          oldChats,
+          payload,
+          currentUserId,
+        );
+
+        if (
+          shouldRefetchChatsOnDelete(chatsWithUpdatedCount, payload.messageId)
+        ) {
+          queryClient.invalidateQueries({ queryKey: ['chats'] });
+          return chatsWithUpdatedCount;
+        }
+
+        return chatsWithUpdatedCount;
+      });
+    };
+
     socket.on('chatListUpdate', handleChatListUpdate);
     socket.on('messagesRead', handleMessagesRead);
+    socket.on('messageUpdated', handleMessageUpdated);
+    socket.on('messageDeleted', handleMessageDeleted);
 
     return () => {
       socket.off('chatListUpdate', handleChatListUpdate);
       socket.off('messagesRead', handleMessagesRead);
+      socket.off('messageUpdated', handleMessageUpdated);
+      socket.off('messageDeleted', handleMessageDeleted);
     };
   }, [socket, queryClient, currentUserId, activeChatId]);
 };

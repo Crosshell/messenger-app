@@ -8,5 +8,6 @@ export interface Message {
   senderId: string;
   chatId: string;
   isRead: boolean;
+  isEdited: boolean;
   sender?: User;
 }
