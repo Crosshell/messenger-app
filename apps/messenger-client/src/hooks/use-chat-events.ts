@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import { useSocket } from './use-socket';
 import { useAuthStore } from '../store/auth.store';
 import { useChatStore } from '../store/chat.store';
@@ -16,7 +16,7 @@ import {
   updateUnreadCountOnDelete,
   shouldRefetchChatsOnDelete,
 } from '../utils/chat-cache-updaters';
-import type { MessageDeletedResponse } from '../types/responses/message-deleted.response.ts';
+import type { MessageDeletedResponse } from '../types/responses/message-deleted.response';
 
 export const useChatEvents = () => {
   const socket = useSocket();
@@ -33,7 +33,6 @@ export const useChatEvents = () => {
           oldChats,
           newMessage,
           currentUserId,
-          activeChatId,
         );
         if (updated === undefined && oldChats) {
           queryClient.invalidateQueries({ queryKey: ['chats'] });
@@ -51,8 +50,9 @@ export const useChatEvents = () => {
       const readUntilTimestamp = new Date(readAt).getTime();
       if (isNaN(readUntilTimestamp)) return;
 
-      queryClient.setQueryData<Message[]>(['messages', chatId], (old) =>
-        updateMessagesOnRead(old, readUntilTimestamp),
+      queryClient.setQueryData<InfiniteData<Message[]>>(
+        ['messages', chatId],
+        (old) => updateMessagesOnRead(old, readUntilTimestamp),
       );
 
       queryClient.setQueryData<Chat[]>(['chats'], (old) =>
@@ -66,11 +66,10 @@ export const useChatEvents = () => {
     };
 
     const handleMessageUpdated = (updatedMessage: Message) => {
-      queryClient.setQueryData<Message[]>(
+      queryClient.setQueryData<InfiniteData<Message[]>>(
         ['messages', updatedMessage.chatId],
         (old) => updateMessageOnEdit(old, updatedMessage),
       );
-
       queryClient.setQueryData<Chat[]>(['chats'], (old) =>
         updateChatListOnEdit(old, updatedMessage),
       );
@@ -78,7 +77,7 @@ export const useChatEvents = () => {
 
     const handleMessageDeleted = (payload: MessageDeletedResponse) => {
       if (activeChatId === payload.chatId) {
-        queryClient.setQueryData<Message[]>(
+        queryClient.setQueryData<InfiniteData<Message[]>>(
           ['messages', payload.chatId],
           (old) => removeMessageOnDelete(old, payload.messageId),
         );

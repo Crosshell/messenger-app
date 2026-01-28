@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Chat, ChatType, Message } from '@prisma/client';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
 @Injectable()
 export class ChatService {
@@ -76,13 +77,19 @@ export class ChatService {
     }));
   }
 
-  async getChatMessages(chatId: string): Promise<Message[]> {
+  async getChatMessages(
+    chatId: string,
+    { limit = 20, cursor }: PaginationDto,
+  ): Promise<Message[]> {
     return this.prisma.message.findMany({
       where: { chatId },
+      take: limit + 1,
+      cursor: cursor ? { id: cursor } : undefined,
+      skip: cursor ? 1 : 0,
       include: {
         sender: { select: { id: true, username: true, avatarUrl: true } },
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: 'desc' },
     });
   }
 

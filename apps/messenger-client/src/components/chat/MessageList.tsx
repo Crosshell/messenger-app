@@ -1,43 +1,54 @@
-import { useEffect, useRef } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
-import { messageService } from '../../services/message.service';
+import { useInView } from 'react-intersection-observer';
 import { MessageBubble } from './MessageBubble';
-import { useAutoRead } from '../../hooks/use-auto-read';
 import { useChatSubscription } from '../../hooks/use-chat-subscription';
+import { useChatMessages } from '../../hooks/use-chat-messages';
+import { useChatScroll } from '../../hooks/use-chat-scroll';
+import { useAuthStore } from '../../store/auth.store';
 
 interface MessageListProps {
   chatId: string;
 }
 
 export const MessageList = ({ chatId }: MessageListProps) => {
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const currentUserId = useAuthStore((state) => state.userId);
 
   const {
-    data: messages,
+    data,
     isLoading,
     isError,
-  } = useQuery({
-    queryKey: ['messages', chatId],
-    queryFn: () => messageService.getMessages(chatId),
-    refetchOnWindowFocus: false,
-  });
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useChatMessages(chatId);
 
   useChatSubscription(chatId);
 
-  useAutoRead(chatId, messages);
+  const messages = useMemo(
+    () => data?.pages.flatMap((p) => p) || [],
+    [data?.pages],
+  );
 
-  const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
-    bottomRef.current?.scrollIntoView({ behavior });
-  };
+  const { containerRef, isReady, handleScroll, saveScrollPosition } =
+    useChatScroll(chatId, messages, isLoading, currentUserId);
+
+  const { ref: topTriggerRef, inView: topInView } = useInView({ threshold: 0 });
 
   useEffect(() => {
-    if (messages) {
-      scrollToBottom('auto');
+    if (topInView && hasNextPage && !isFetchingNextPage) {
+      saveScrollPosition();
+      fetchNextPage();
     }
-  }, [messages?.length, chatId]);
+  }, [
+    topInView,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    saveScrollPosition,
+  ]);
 
-  if (isLoading) {
+  if (isLoading && !isReady) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-purple-500 animate-spin" />
@@ -45,23 +56,35 @@ export const MessageList = ({ chatId }: MessageListProps) => {
     );
   }
 
-  if (isError) {
+  if (isError)
     return (
-      <div className="flex-1 flex items-center justify-center text-red-500">
-        Something went wrong loading messages
+      <div className="flex-1 text-center text-red-500 mt-10">
+        Error loading messages
       </div>
     );
-  }
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 custom-scrollbar flex flex-col">
-      <div className="flex-1" />
+    <div
+      ref={containerRef}
+      onScroll={handleScroll}
+      className={`flex-1 overflow-y-auto p-4 custom-scrollbar flex flex-col transition-opacity duration-150 ${isReady ? 'opacity-100' : 'opacity-0'}`}
+    >
+      {hasNextPage && (
+        <div ref={topTriggerRef} className="h-8 flex justify-center shrink-0">
+          {isFetchingNextPage && (
+            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+          )}
+        </div>
+      )}
+      {!hasNextPage && <div className="flex-1" />}
 
-      {messages?.map((message) => (
-        <MessageBubble key={message.id} message={message} />
+      {messages.map((message) => (
+        <MessageBubble
+          key={message.id}
+          message={message}
+          canMarkRead={isReady}
+        />
       ))}
-
-      <div ref={bottomRef} />
     </div>
   );
 };

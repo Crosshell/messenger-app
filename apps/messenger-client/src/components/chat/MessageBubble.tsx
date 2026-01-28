@@ -5,32 +5,41 @@ import type { Message } from '../../types/message.type';
 import { Check, CheckCheck, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { useChatStore } from '../../store/chat.store';
 import { useMessageActions } from '../../hooks/use-message-actions';
+import { useInView } from 'react-intersection-observer';
+import { useMarkRead } from '../../hooks/use-mark-read';
 
-interface MessageBubbleProps {
+export const MessageBubble = ({
+  message,
+  canMarkRead,
+}: {
   message: Message;
-}
-
-export const MessageBubble = ({ message }: MessageBubbleProps) => {
+  canMarkRead: boolean;
+}) => {
   const currentUserId = useAuthStore((state) => state.userId);
   const setMessageToEdit = useChatStore((state) => state.setMessageToEdit);
   const { deleteMessage } = useMessageActions(message.chatId);
-
   const [showMenu, setShowMenu] = useState(false);
 
   const isMe = message.senderId === currentUserId;
 
-  const handleEdit = () => {
-    setMessageToEdit(message);
-    setShowMenu(false);
-  };
+  const { ref, inView } = useInView({
+    threshold: 0.5,
+    triggerOnce: true,
+    skip: isMe || message.isRead || !canMarkRead,
+  });
 
-  const handleDelete = () => {
-    deleteMessage(message.id);
-    setShowMenu(false);
-  };
+  useMarkRead({
+    inView,
+    isMe,
+    isRead: message.isRead,
+    chatId: message.chatId,
+    messageId: message.id,
+  });
 
   return (
     <div
+      ref={ref}
+      data-message-id={message.id}
       className={`flex w-full mb-4 group/row ${isMe ? 'justify-end' : 'justify-start'}`}
       onMouseLeave={() => setShowMenu(false)}
     >
@@ -42,18 +51,23 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
           >
             <MoreVertical size={16} />
           </button>
-
           {showMenu && (
             <div className="absolute bottom-8 right-0 bg-white shadow-lg border border-slate-100 rounded-lg py-1 w-32 z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-100">
               <button
-                onClick={handleEdit}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-purple-600 text-left"
+                onClick={() => {
+                  setMessageToEdit(message);
+                  setShowMenu(false);
+                }}
+                className="flex gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-purple-600"
               >
                 <Pencil size={14} /> Edit
               </button>
               <button
-                onClick={handleDelete}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 text-left"
+                onClick={() => {
+                  deleteMessage(message.id);
+                  setShowMenu(false);
+                }}
+                className="flex gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50"
               >
                 <Trash2 size={14} /> Delete
               </button>
@@ -63,36 +77,22 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
       )}
 
       <div
-        className={`
-          max-w-[70%] px-4 py-2 rounded-2xl shadow-sm relative group
-          ${
-            isMe
-              ? 'bg-purple-600 text-white rounded-br-none'
-              : 'bg-white rounded-bl-none border border-slate-100'
-          }
-        `}
+        className={`max-w-[70%] px-4 py-2 rounded-2xl shadow-sm relative group ${isMe ? 'bg-purple-600 text-white rounded-br-none' : 'bg-white rounded-bl-none border border-slate-100'}`}
       >
         <p className="whitespace-pre-wrap wrap-break-word text-sm leading-relaxed">
           {message.content}
         </p>
-
         <div
-          className={`flex items-center justify-end gap-1 text-[10px] select-none mt-1
-          ${isMe ? 'text-purple-200' : 'text-slate-400'}`}
+          className={`flex items-center justify-end gap-1 text-[10px] select-none mt-1 ${isMe ? 'text-purple-200' : 'text-slate-400'}`}
         >
           {message.isEdited && <span className="italic mr-1">edited</span>}
-
           <span>{formatMessageDate(message.createdAt)}</span>
-
-          {isMe && (
-            <span className={message.isRead ? 'text-blue-200' : ''}>
-              {message.isRead ? (
-                <CheckCheck size={14} strokeWidth={2} />
-              ) : (
-                <Check size={14} strokeWidth={2} />
-              )}
-            </span>
-          )}
+          {isMe &&
+            (message.isRead ? (
+              <CheckCheck size={14} strokeWidth={2} className="text-blue-200" />
+            ) : (
+              <Check size={14} strokeWidth={2} />
+            ))}
         </div>
       </div>
     </div>

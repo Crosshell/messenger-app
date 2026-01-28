@@ -16,6 +16,9 @@ export const formatMessageDate = (dateString: string): string => {
   }
 
   return new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
     day: 'numeric',
     month: 'short',
   }).format(date);

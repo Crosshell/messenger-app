@@ -7,12 +7,14 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { Authorization } from '../auth/decorators/authorization.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { Chat, Message } from '@prisma/client';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
 @Controller('chats')
 @Authorization()
@@ -36,7 +38,8 @@ export class ChatController {
   @Get(':chatId/messages')
   async getChatMessages(
     @Param('chatId', ParseUUIDPipe) chatId: string,
+    @Query() dto: PaginationDto,
   ): Promise<Message[]> {
-    return this.service.getChatMessages(chatId);
+    return this.service.getChatMessages(chatId, dto);
   }
 }
