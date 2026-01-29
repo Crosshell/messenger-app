@@ -1,29 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuthStore } from '../store/auth.store';
 
 const BASE_API_URL = import.meta.env.VITE_API_URL;
 
-let socketInstance: Socket | null = null;
-
 export const useSocket = () => {
-  const accessToken = useAuthStore((state) => state.accessToken);
-  const [socket, setSocket] = useState<Socket | null>(socketInstance);
+  const { accessToken } = useAuthStore();
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    if (!accessToken) {
-      if (socketInstance) {
-        socketInstance.disconnect();
-        socketInstance = null;
-        setSocket(null);
-      }
-      return;
-    }
-
-    if (socketInstance) {
-      setSocket(socketInstance);
-      return;
-    }
+    if (!accessToken) return;
 
     const newSocket = io(BASE_API_URL, {
       extraHeaders: {
@@ -31,11 +19,24 @@ export const useSocket = () => {
       },
       withCredentials: true,
       autoConnect: true,
-      reconnection: true,
+      reconnection: false,
+      forceNew: true,
     });
 
-    socketInstance = newSocket;
+    socketRef.current = newSocket;
     setSocket(newSocket);
+
+    newSocket.on('connect_error', (err) => {
+      console.error('Socket connect error:', err.message);
+    });
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.removeAllListeners();
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
   }, [accessToken]);
 
   return socket;

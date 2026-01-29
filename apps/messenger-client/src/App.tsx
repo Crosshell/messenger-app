@@ -8,8 +8,11 @@ import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { ResendVerificationPage } from './pages/ResendVerificationPage';
 import { ChatPage } from './pages/ChatPage';
 import { ProtectedRoute } from './components/routes/ProtectedRoute';
+import { useAutoRefresh } from './hooks/use-auto-refresh.ts';
 
 export default function App() {
+  useAutoRefresh();
+
   return (
     <>
       <Routes>
