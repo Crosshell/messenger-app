@@ -46,14 +46,15 @@ export class StorageService {
 
     const url = await getSignedUrl(this.s3Client, command, { expiresIn: 300 });
 
+    const region = this.config.getOrThrow<string>('aws.region');
     return {
       uploadUrl: url,
-      fileUrl: `https://${this.bucketName}.s3.${this.config.getOrThrow('aws.region')}.amazonaws.com/${key}`,
+      fileUrl: `https://${this.bucketName}.s3.${region}.amazonaws.com/${key}`,
       key: key,
     };
   }
 
-  async deleteFile(key: string) {
+  async deleteFile(key: string): Promise<void> {
     const command = new DeleteObjectCommand({
       Bucket: this.bucketName,
       Key: key,
