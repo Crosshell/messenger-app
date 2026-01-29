@@ -31,8 +31,11 @@ export class ChatController {
   }
 
   @Get()
-  async getChats(@CurrentUser('sub') currentUserId: string) {
-    return this.service.getUserChats(currentUserId);
+  async getChats(
+    @CurrentUser('sub') currentUserId: string,
+    @Query() dto: PaginationDto,
+  ) {
+    return this.service.getUserChats(currentUserId, dto);
   }
 
   @Get(':chatId/messages')

@@ -1,29 +1,50 @@
+import { useEffect, useMemo } from 'react';
 import { Loader2, SearchX } from 'lucide-react';
+import { useInView } from 'react-intersection-observer';
 import { useChatList } from '../../../hooks/use-chat-list';
 import { ChatListItem } from './ChatListItem';
 import { useAuthStore } from '../../../store/auth.store';
-import { useMemo } from 'react';
 
 interface ChatListProps {
   searchQuery: string;
 }
 
 export const ChatList = ({ searchQuery }: ChatListProps) => {
-  const { data: chats, isLoading, isError } = useChatList();
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useChatList();
+
   const currentUserId = useAuthStore((state) => state.userId);
 
+  const { ref, inView } = useInView();
+
+  const allChats = useMemo(() => {
+    return data?.pages.flatMap((page) => page.data) || [];
+  }, [data?.pages]);
+
   const filteredChats = useMemo(() => {
-    if (!chats) return [];
-    if (!searchQuery.trim()) return chats;
+    if (!allChats) return [];
+    if (!searchQuery.trim()) return allChats;
 
     const lowerQuery = searchQuery.toLowerCase();
 
-    return chats.filter((chat) => {
+    return allChats.filter((chat) => {
       const otherMember = chat.members.find((m) => m.user.id !== currentUserId);
       const username = otherMember?.user?.username || '';
       return username.toLowerCase().includes(lowerQuery);
     });
-  }, [chats, searchQuery, currentUserId]);
+  }, [allChats, searchQuery, currentUserId]);
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isLoading) {
     return (
@@ -41,7 +62,7 @@ export const ChatList = ({ searchQuery }: ChatListProps) => {
     );
   }
 
-  if ((!chats || chats.length === 0) && !searchQuery) {
+  if (allChats.length === 0 && !searchQuery) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
         <p>No chats yet</p>
@@ -64,6 +85,14 @@ export const ChatList = ({ searchQuery }: ChatListProps) => {
       {filteredChats.map((chat) => (
         <ChatListItem key={chat.id} chat={chat} />
       ))}
+
+      {hasNextPage && (
+        <div ref={ref} className="p-4 flex justify-center">
+          {isFetchingNextPage && (
+            <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+          )}
+        </div>
+      )}
     </div>
   );
 };

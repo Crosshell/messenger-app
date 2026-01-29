@@ -8,11 +8,16 @@ import { useMemo } from 'react';
 
 export const ActiveChat = () => {
   const activeChatId = useChatStore((state) => state.activeChatId);
-  const { data: chats } = useChatList();
+  const { data } = useChatList();
 
   const activeChat = useMemo(() => {
-    return chats?.find((chat) => chat.id === activeChatId);
-  }, [chats, activeChatId]);
+    if (!data?.pages || !activeChatId) return;
+
+    for (const page of data.pages) {
+      const found = page.data.find((chat) => chat.id === activeChatId);
+      if (found) return found;
+    }
+  }, [data, activeChatId]);
 
   if (!activeChatId || !activeChat) {
     return <ChatEmptyState />;

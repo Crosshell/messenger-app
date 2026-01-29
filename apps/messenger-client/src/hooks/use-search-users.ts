@@ -9,10 +9,15 @@ export const useSearchUsers = () => {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['users', 'search', debouncedQuery],
-    queryFn: () => userService.searchUsers(debouncedQuery),
+    queryFn: () => userService.searchUsers(debouncedQuery, 1),
     enabled: debouncedQuery.length >= 3,
-    staleTime: 1000 * 60,
   });
 
-  return { query, setQuery, users: data || [], isLoading, isError };
+  return {
+    query,
+    setQuery,
+    users: data?.data || [],
+    isLoading,
+    isError,
+  };
 };

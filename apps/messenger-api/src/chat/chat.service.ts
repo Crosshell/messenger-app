@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Chat, ChatType, Message } from '@prisma/client';
 import { PaginationDto } from '../common/dto/pagination.dto';
+import { PaginatedResponse } from '../common/responses/paginated.response';
 
 @Injectable()
 export class ChatService {
@@ -47,10 +48,18 @@ export class ChatService {
     });
   }
 
-  async getUserChats(userId: string) {
+  async getUserChats(
+    userId: string,
+    { limit = 20, cursor }: PaginationDto,
+  ): Promise<PaginatedResponse<Chat>> {
+    const take = limit + 1;
+
     const chats = await this.prisma.chat.findMany({
       where: { members: { some: { userId } } },
       orderBy: { lastMessageAt: 'desc' },
+      take: take,
+      cursor: cursor ? { id: cursor } : undefined,
+      skip: cursor ? 1 : 0,
       include: {
         ...this.includeMembers,
         messages: {
@@ -70,11 +79,25 @@ export class ChatService {
       },
     });
 
-    return chats.map((chat) => ({
+    let nextCursor: string | null = null;
+
+    if (chats.length > limit) {
+      chats.pop();
+      nextCursor = chats[chats.length - 1].id;
+    }
+
+    const formattedChats = chats.map((chat) => ({
       ...chat,
       unreadCount: chat._count.messages,
       _count: undefined,
     }));
+
+    return {
+      data: formattedChats,
+      meta: {
+        nextCursor,
+      },
+    };
   }
 
   async getChatMessages(

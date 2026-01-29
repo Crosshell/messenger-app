@@ -4,6 +4,7 @@ import { Authorization } from '../auth/decorators/authorization.decorator';
 import type { UserWithoutPassword } from './types/user-without-password.type';
 import { UserService } from './user.service';
 import { FindManyUsersDto } from './dto/find-many-users.dto';
+import { PaginatedResponse } from '../common/responses/paginated.response';
 
 @Controller('users')
 @Authorization()
@@ -20,7 +21,7 @@ export class UserController {
   @Get()
   async findMany(
     @Query() dto: FindManyUsersDto,
-  ): Promise<UserWithoutPassword[]> {
+  ): Promise<PaginatedResponse<UserWithoutPassword>> {
     return this.service.findMany(dto);
   }
 }

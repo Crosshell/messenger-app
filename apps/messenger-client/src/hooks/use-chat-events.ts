@@ -1,52 +1,29 @@
 import { useEffect } from 'react';
 import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import { useSocket } from './use-socket';
-import { useAuthStore } from '../store/auth.store';
 import { useChatStore } from '../store/chat.store';
 import type { Message } from '../types/message.type';
-import type { Chat } from '../types/chat.type';
 import type { MessagesReadResponse } from '../types/responses/messages-read.response';
+import type { MessageDeletedResponse } from '../types/responses/message-deleted.response';
 import {
-  updateChatListOnNewMessage,
-  updateChatListReadStatus,
   updateMessagesOnRead,
   updateMessageOnEdit,
   removeMessageOnDelete,
-  updateChatListOnEdit,
-  updateUnreadCountOnDelete,
-  shouldRefetchChatsOnDelete,
 } from '../utils/chat-cache-updaters';
-import type { MessageDeletedResponse } from '../types/responses/message-deleted.response';
 
 export const useChatEvents = () => {
   const socket = useSocket();
   const queryClient = useQueryClient();
-  const currentUserId = useAuthStore((state) => state.userId);
   const activeChatId = useChatStore((state) => state.activeChatId);
 
   useEffect(() => {
     if (!socket) return;
 
-    const handleChatListUpdate = (newMessage: Message) => {
-      queryClient.setQueryData<Chat[]>(['chats'], (oldChats) => {
-        const updated = updateChatListOnNewMessage(
-          oldChats,
-          newMessage,
-          currentUserId,
-        );
-        if (updated === undefined && oldChats) {
-          queryClient.invalidateQueries({ queryKey: ['chats'] });
-          return oldChats;
-        }
-        return updated;
-      });
+    const handleChatListUpdate = () => {
+      queryClient.invalidateQueries({ queryKey: ['chats'] });
     };
 
-    const handleMessagesRead = ({
-      chatId,
-      readAt,
-      readerId,
-    }: MessagesReadResponse) => {
+    const handleMessagesRead = ({ chatId, readAt }: MessagesReadResponse) => {
       const readUntilTimestamp = new Date(readAt).getTime();
       if (isNaN(readUntilTimestamp)) return;
 
@@ -55,14 +32,7 @@ export const useChatEvents = () => {
         (old) => updateMessagesOnRead(old, readUntilTimestamp),
       );
 
-      queryClient.setQueryData<Chat[]>(['chats'], (old) =>
-        updateChatListReadStatus(old, {
-          chatId,
-          readerId,
-          currentUserId,
-          readUntilTimestamp,
-        }),
-      );
+      queryClient.invalidateQueries({ queryKey: ['chats'] });
     };
 
     const handleMessageUpdated = (updatedMessage: Message) => {
@@ -70,9 +40,8 @@ export const useChatEvents = () => {
         ['messages', updatedMessage.chatId],
         (old) => updateMessageOnEdit(old, updatedMessage),
       );
-      queryClient.setQueryData<Chat[]>(['chats'], (old) =>
-        updateChatListOnEdit(old, updatedMessage),
-      );
+
+      queryClient.invalidateQueries({ queryKey: ['chats'] });
     };
 
     const handleMessageDeleted = (payload: MessageDeletedResponse) => {
@@ -83,22 +52,7 @@ export const useChatEvents = () => {
         );
       }
 
-      queryClient.setQueryData<Chat[]>(['chats'], (oldChats) => {
-        const chatsWithUpdatedCount = updateUnreadCountOnDelete(
-          oldChats,
-          payload,
-          currentUserId,
-        );
-
-        if (
-          shouldRefetchChatsOnDelete(chatsWithUpdatedCount, payload.messageId)
-        ) {
-          queryClient.invalidateQueries({ queryKey: ['chats'] });
-          return chatsWithUpdatedCount;
-        }
-
-        return chatsWithUpdatedCount;
-      });
+      queryClient.invalidateQueries({ queryKey: ['chats'] });
     };
 
     socket.on('chatListUpdate', handleChatListUpdate);
@@ -112,5 +66,5 @@ export const useChatEvents = () => {
       socket.off('messageUpdated', handleMessageUpdated);
       socket.off('messageDeleted', handleMessageDeleted);
     };
-  }, [socket, queryClient, currentUserId, activeChatId]);
+  }, [socket, queryClient, activeChatId]);
 };
