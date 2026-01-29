@@ -50,15 +50,15 @@ export const MessageList = ({ chatId }: MessageListProps) => {
 
   if (isLoading && !isReady) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-purple-500 animate-spin" />
+      <div className="flex flex-1 items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
       </div>
     );
   }
 
   if (isError)
     return (
-      <div className="flex-1 text-center text-red-500 mt-10">
+      <div className="mt-10 flex-1 text-center text-red-500">
         Error loading messages
       </div>
     );
@@ -67,12 +67,12 @@ export const MessageList = ({ chatId }: MessageListProps) => {
     <div
       ref={containerRef}
       onScroll={handleScroll}
-      className={`flex-1 overflow-y-auto p-4 custom-scrollbar flex flex-col transition-opacity duration-150 ${isReady ? 'opacity-100' : 'opacity-0'}`}
+      className={`custom-scrollbar flex flex-1 flex-col overflow-y-auto p-4 transition-opacity duration-150 ${isReady ? 'opacity-100' : 'opacity-0'}`}
     >
       {hasNextPage && (
-        <div ref={topTriggerRef} className="h-8 flex justify-center shrink-0">
+        <div ref={topTriggerRef} className="flex h-8 shrink-0 justify-center">
           {isFetchingNextPage && (
-            <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+            <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
           )}
         </div>
       )}

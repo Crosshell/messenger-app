@@ -48,15 +48,15 @@ export const ChatList = ({ searchQuery }: ChatListProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center text-slate-400">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="flex flex-1 items-center justify-center text-slate-400">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="flex-1 flex items-center justify-center text-red-400 text-sm px-4 text-center">
+      <div className="flex flex-1 items-center justify-center px-4 text-center text-sm text-red-400">
         Failed to load chats
       </div>
     );
@@ -64,7 +64,7 @@ export const ChatList = ({ searchQuery }: ChatListProps) => {
 
   if (allChats.length === 0 && !searchQuery) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
+      <div className="flex flex-1 flex-col items-center justify-center p-4 text-center text-slate-400">
         <p>No chats yet</p>
       </div>
     );
@@ -72,8 +72,8 @@ export const ChatList = ({ searchQuery }: ChatListProps) => {
 
   if (filteredChats.length === 0 && searchQuery) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
-        <SearchX className="w-10 h-10 mb-2 opacity-50" />
+      <div className="flex flex-1 flex-col items-center justify-center p-4 text-center text-slate-400">
+        <SearchX className="mb-2 h-10 w-10 opacity-50" />
         <p>No chats found</p>
         <p className="text-sm">Try searching for a new user via the + button</p>
       </div>
@@ -81,15 +81,15 @@ export const ChatList = ({ searchQuery }: ChatListProps) => {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar">
+    <div className="custom-scrollbar flex-1 overflow-y-auto">
       {filteredChats.map((chat) => (
         <ChatListItem key={chat.id} chat={chat} />
       ))}
 
       {hasNextPage && (
-        <div ref={ref} className="p-4 flex justify-center">
+        <div ref={ref} className="flex justify-center p-4">
           {isFetchingNextPage && (
-            <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+            <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
           )}
         </div>
       )}

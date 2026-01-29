@@ -32,13 +32,13 @@ export const ForgotPasswordPage = () => {
   if (isSuccess) {
     return (
       <div className="text-center">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <CheckCircle2 className="text-green-600" size={32} />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="mb-2 text-2xl font-bold text-gray-900">
           Check your mail
         </h2>
-        <p className="text-gray-500 mb-6">
+        <p className="mb-6 text-gray-500">
           We have sent a password recover instructions to your email
         </p>
         <Link to="/login">
@@ -50,15 +50,15 @@ export const ForgotPasswordPage = () => {
 
   return (
     <>
-      <div className="text-center mb-8">
+      <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-purple-950">Forgot Password?</h1>
-        <p className="text-slate-400 mt-2">
+        <p className="mt-2 text-slate-400">
           No worries, we'll send you reset instructions
         </p>
       </div>
 
       {errors.root && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-200 text-red-700 rounded-md text-sm text-center">
+        <div className="mb-4 rounded-md border border-red-200 bg-red-100 p-3 text-center text-sm text-red-700">
           {errors.root.message}
         </div>
       )}
@@ -80,7 +80,7 @@ export const ForgotPasswordPage = () => {
       <div className="mt-6 text-center">
         <Link
           to="/login"
-          className="text-sm text-slate-500 hover:text-gray-900 flex items-center justify-center gap-2 transition-colors"
+          className="flex items-center justify-center gap-2 text-sm text-slate-500 transition-colors hover:text-gray-900"
         >
           <ArrowLeft size={16} />
           Back to log in

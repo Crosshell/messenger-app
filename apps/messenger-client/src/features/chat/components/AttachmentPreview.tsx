@@ -19,25 +19,25 @@ export const AttachmentPreview = ({
   if (files.length === 0 && existingAttachments.length === 0) return null;
 
   return (
-    <div className="flex gap-2 p-4 overflow-x-auto bg-slate-50 border-t border-slate-200">
+    <div className="flex gap-2 overflow-x-auto border-t border-slate-200 bg-slate-50 p-4">
       {existingAttachments.map((att) => {
         const isImage = att.mimeType?.startsWith('image/');
 
         return (
           <div
             key={att.id}
-            className="relative group shrink-0 w-24 h-24 bg-white rounded-lg border border-purple-200 overflow-hidden flex items-center justify-center"
+            className="group relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-purple-200 bg-white"
           >
             {isImage ? (
               <img
                 src={att.url}
                 alt="preview"
-                className="w-full h-full object-cover opacity-80"
+                className="h-full w-full object-cover opacity-80"
               />
             ) : (
-              <div className="text-purple-500 flex flex-col items-center p-2 text-center">
+              <div className="flex flex-col items-center p-2 text-center text-purple-500">
                 <FileText size={24} className="mb-1" />
-                <span className="text-[10px] truncate w-full">
+                <span className="w-full truncate text-[10px]">
                   {att.filename}
                 </span>
               </div>
@@ -45,7 +45,7 @@ export const AttachmentPreview = ({
             <button
               onClick={() => att.id && onRemoveExisting(att.id)}
               disabled={disabled}
-              className="absolute top-1 right-1 bg-black/50 hover:bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-all"
+              className="absolute top-1 right-1 rounded-full bg-black/50 p-0.5 text-white opacity-0 transition-all group-hover:opacity-100 hover:bg-red-500"
             >
               <X size={14} />
             </button>
@@ -60,25 +60,25 @@ export const AttachmentPreview = ({
         return (
           <div
             key={`new-${index}`}
-            className="relative group shrink-0 w-24 h-24 bg-white rounded-lg border border-slate-200 overflow-hidden flex items-center justify-center"
+            className="group relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white"
           >
             {isImage && previewUrl ? (
               <img
                 src={previewUrl}
                 alt="preview"
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
               />
             ) : (
-              <div className="text-slate-400 flex flex-col items-center p-2 text-center">
+              <div className="flex flex-col items-center p-2 text-center text-slate-400">
                 <FileText size={24} className="mb-1" />
-                <span className="text-[10px] truncate w-full">{file.name}</span>
+                <span className="w-full truncate text-[10px]">{file.name}</span>
               </div>
             )}
 
             <button
               onClick={() => onRemoveNew(index)}
               disabled={disabled}
-              className="absolute top-1 right-1 bg-black/50 hover:bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-all disabled:opacity-0"
+              className="absolute top-1 right-1 rounded-full bg-black/50 p-0.5 text-white opacity-0 transition-all group-hover:opacity-100 hover:bg-red-500 disabled:opacity-0"
             >
               <X size={14} />
             </button>

@@ -16,26 +16,26 @@ export const SidebarHeader = () => {
 
   return (
     <>
-      <div className="h-16 px-4 border-b border-slate-200 flex items-center justify-between bg-white shrink-0">
+      <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4">
         <div className="flex items-center gap-2 text-purple-700">
-          <MessageSquare className="w-6 h-6" />
-          <span className="font-bold text-xl tracking-tight">ChatApp</span>
+          <MessageSquare className="h-6 w-6" />
+          <span className="text-xl font-bold tracking-tight">ChatApp</span>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="p-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+            className="rounded-full p-2 text-slate-600 transition-colors hover:bg-slate-100"
             title="New Chat"
           >
             <Plus size={20} />
           </button>
 
-          <div className="w-px h-6 bg-slate-200 mx-1" />
+          <div className="mx-1 h-6 w-px bg-slate-200" />
 
           <button
             onClick={handleLogout}
-            className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+            className="rounded-full p-2 text-slate-600 transition-colors hover:bg-red-50 hover:text-red-600"
             title="Logout"
           >
             <LogOut size={20} />

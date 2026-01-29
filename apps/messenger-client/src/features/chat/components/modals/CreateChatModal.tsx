@@ -17,19 +17,19 @@ export const CreateChatModal = ({ isOpen, onClose }: CreateChatModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="font-semibold text-lg">New Chat</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md overflow-hidden rounded-xl bg-white shadow-xl">
+        <div className="flex items-center justify-between border-b p-4">
+          <h3 className="text-lg font-semibold">New Chat</h3>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-slate-100 rounded-full transition-colors"
+            className="rounded-full p-1 transition-colors hover:bg-slate-100"
           >
             <X size={20} className="text-slate-500" />
           </button>
         </div>
 
-        <div className="p-4 border-b">
+        <div className="border-b p-4">
           <Input
             placeholder="Search users by username..."
             icon={<Search size={18} />}
@@ -41,8 +41,8 @@ export const CreateChatModal = ({ isOpen, onClose }: CreateChatModalProps) => {
 
         <div className="h-64 overflow-y-auto">
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center h-full text-slate-400">
-              <Loader2 className="animate-spin mb-2" />
+            <div className="flex h-full flex-col items-center justify-center text-slate-400">
+              <Loader2 className="mb-2 animate-spin" />
               <span className="text-sm">Searching...</span>
             </div>
           ) : users.length > 0 ? (
@@ -52,14 +52,14 @@ export const CreateChatModal = ({ isOpen, onClose }: CreateChatModalProps) => {
                   <button
                     onClick={() => createChat(user.id)}
                     disabled={isPending}
-                    className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 transition-colors text-left disabled:opacity-50"
+                    className="flex w-full items-center gap-3 p-3 text-left transition-colors hover:bg-slate-50 disabled:opacity-50"
                   >
-                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100 text-purple-600">
                       {user.avatarUrl ? (
                         <img
                           src={user.avatarUrl}
                           alt={user.username}
-                          className="w-full h-full rounded-full object-cover"
+                          className="h-full w-full rounded-full object-cover"
                         />
                       ) : (
                         <UserIcon size={20} />
@@ -75,7 +75,7 @@ export const CreateChatModal = ({ isOpen, onClose }: CreateChatModalProps) => {
               ))}
             </ul>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-slate-400">
+            <div className="flex h-full flex-col items-center justify-center text-slate-400">
               {query.length < 3 ? (
                 <span>Type at least 3 characters</span>
               ) : (

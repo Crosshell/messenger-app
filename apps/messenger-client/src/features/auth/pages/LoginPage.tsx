@@ -36,13 +36,13 @@ export const LoginPage = () => {
 
   return (
     <>
-      <div className="text-center mb-8">
+      <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-purple-950">Welcome Back</h1>
-        <p className="text-slate-400 mt-2">Please sign in to continue</p>
+        <p className="mt-2 text-slate-400">Please sign in to continue</p>
       </div>
 
       {errors.root && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-200 text-red-700 rounded-md text-sm flex items-center justify-center">
+        <div className="mb-4 flex items-center justify-center rounded-md border border-red-200 bg-red-100 p-3 text-sm text-red-700">
           {errors.root.message}
         </div>
       )}
@@ -93,7 +93,7 @@ export const LoginPage = () => {
         Don't have an account?{' '}
         <Link
           to="/register"
-          className="text-blue-500 font-semibold hover:underline"
+          className="font-semibold text-blue-500 hover:underline"
         >
           Register
         </Link>

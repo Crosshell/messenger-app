@@ -30,7 +30,7 @@ export const ChatListItem = ({ chat }: ChatListItemProps) => {
 
   const messagePreview = useMemo(() => {
     if (!lastMessage)
-      return <span className="italic text-slate-400">No messages yet</span>;
+      return <span className="text-slate-400 italic">No messages yet</span>;
 
     if (lastMessage.content) {
       return <span className="truncate">{lastMessage.content}</span>;
@@ -47,21 +47,21 @@ export const ChatListItem = ({ chat }: ChatListItemProps) => {
       );
     }
 
-    return <span className="italic text-slate-400">Empty message</span>;
+    return <span className="text-slate-400 italic">Empty message</span>;
   }, [lastMessage]);
 
   return (
     <button
       onClick={() => setActiveChatId(chat.id)}
-      className={`w-full p-3 flex items-center gap-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-50 ${isActive ? 'bg-purple-50 hover:bg-purple-50' : ''}`}
+      className={`flex w-full items-center gap-3 border-b border-slate-50 p-3 text-left transition-colors hover:bg-slate-50 ${isActive ? 'bg-purple-50 hover:bg-purple-50' : ''}`}
     >
       <div className="relative shrink-0">
-        <div className="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center overflow-hidden text-slate-500">
+        <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-slate-500">
           {targetUser?.avatarUrl ? (
             <img
               src={avatarUrl}
               alt={username}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
             />
           ) : (
             <UserIcon size={24} />
@@ -69,23 +69,23 @@ export const ChatListItem = ({ chat }: ChatListItemProps) => {
         </div>
       </div>
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between mb-0.5">
-          <span className="font-semibold text-slate-900 truncate">
+      <div className="min-w-0 flex-1">
+        <div className="mb-0.5 flex items-center justify-between">
+          <span className="truncate font-semibold text-slate-900">
             {username}
           </span>
           {lastMessage && (
-            <span className="text-xs text-slate-400 shrink-0 ml-2">
+            <span className="ml-2 shrink-0 text-xs text-slate-400">
               {formatMessageDate(lastMessage.createdAt)}
             </span>
           )}
         </div>
 
         <div className="flex items-center justify-between gap-2">
-          <p className="text-sm text-slate-500 truncate flex-1 flex items-center">
+          <p className="flex flex-1 items-center truncate text-sm text-slate-500">
             {lastMessage && isMyLastMessage && (
-              <span className="mr-1 flex items-center shrink-0">
-                <span className="text-purple-600 mr-1">You:</span>
+              <span className="mr-1 flex shrink-0 items-center">
+                <span className="mr-1 text-purple-600">You:</span>
                 {isMessageRead ? (
                   <CheckCheck size={14} className="text-blue-500" />
                 ) : (
@@ -98,7 +98,7 @@ export const ChatListItem = ({ chat }: ChatListItemProps) => {
           </p>
 
           {chat.unreadCount > 0 && (
-            <div className="shrink-0 bg-purple-600 text-white text-[10px] font-bold h-5 min-w-5 px-1.5 flex items-center justify-center rounded-full shadow-sm">
+            <div className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-purple-600 px-1.5 text-[10px] font-bold text-white shadow-sm">
               {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
             </div>
           )}

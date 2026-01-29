@@ -52,16 +52,16 @@ export const ActiveChat = () => {
 
   return (
     <div
-      className="flex-1 flex flex-col h-full bg-slate-50 overflow-hidden relative"
+      className="relative flex h-full flex-1 flex-col overflow-hidden bg-slate-50"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       {isDragging && (
-        <div className="absolute inset-0 z-50 bg-purple-500/10 backdrop-blur-sm border-2 border-dashed border-purple-500 flex flex-col items-center justify-center pointer-events-none">
+        <div className="pointer-events-none absolute inset-0 z-50 flex flex-col items-center justify-center border-2 border-dashed border-purple-500 bg-purple-500/10 backdrop-blur-sm">
           <UploadCloud
             size={64}
-            className="text-purple-600 mb-4 animate-bounce"
+            className="mb-4 animate-bounce text-purple-600"
           />
           <p className="text-xl font-bold text-purple-700">
             Drop files to upload

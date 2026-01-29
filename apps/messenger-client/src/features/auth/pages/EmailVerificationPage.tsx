@@ -10,11 +10,11 @@ export const EmailVerificationPage = () => {
   if (!token) {
     return (
       <div className="text-center">
-        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
           <XCircle className="text-red-600" size={32} />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Invalid Link</h1>
-        <p className="text-gray-500 mb-6">
+        <h1 className="mb-2 text-2xl font-bold text-gray-900">Invalid Link</h1>
+        <p className="mb-6 text-gray-500">
           The verification link is missing or broken
         </p>
         <Link to="/login">
@@ -28,9 +28,9 @@ export const EmailVerificationPage = () => {
 
   if (isLoading) {
     return (
-      <div className="text-center py-8">
-        <Loader2 className="w-12 h-12 text-purple-600 animate-spin mx-auto mb-4" />
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Verifying...</h1>
+      <div className="py-8 text-center">
+        <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-purple-600" />
+        <h1 className="mb-2 text-2xl font-bold text-gray-900">Verifying...</h1>
         <p className="text-gray-500">Please wait while we verify your email</p>
       </div>
     );
@@ -39,13 +39,13 @@ export const EmailVerificationPage = () => {
   if (isSuccess) {
     return (
       <div className="text-center">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <CheckCircle2 className="text-green-600" size={32} />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <h1 className="mb-2 text-2xl font-bold text-gray-900">
           Email Verified!
         </h1>
-        <p className="text-gray-500 mb-6">
+        <p className="mb-6 text-gray-500">
           Your account has been successfully activated
         </p>
         <Link to="/login">
@@ -63,13 +63,13 @@ export const EmailVerificationPage = () => {
 
     return (
       <div className="text-center">
-        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
           <XCircle className="text-red-600" size={32} />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <h1 className="mb-2 text-2xl font-bold text-gray-900">
           Verification Failed
         </h1>
-        <p className="text-gray-500 mb-6 max-w-xs mx-auto">{errorMessage}</p>
+        <p className="mx-auto mb-6 max-w-xs text-gray-500">{errorMessage}</p>
         <div className="flex flex-col gap-3">
           <Link to="/login">
             <Button className="w-full" variant="outline">

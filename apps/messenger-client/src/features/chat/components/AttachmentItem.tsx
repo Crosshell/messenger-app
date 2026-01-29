@@ -24,7 +24,7 @@ export const AttachmentItem = ({ attachment, isMe }: AttachmentItemProps) => {
               filename: attachment.filename,
             })
           }
-          className="w-full max-h-96 object-cover cursor-zoom-in hover:brightness-90 transition-all select-none"
+          className="max-h-96 w-full cursor-zoom-in object-cover transition-all select-none hover:brightness-90"
           loading="lazy"
         />
       </div>
@@ -37,17 +37,17 @@ export const AttachmentItem = ({ attachment, isMe }: AttachmentItemProps) => {
         href={attachment.url}
         target="_blank"
         rel="noopener noreferrer"
-        className={`flex items-center gap-3 p-3 rounded-xl transition-colors border ${
+        className={`flex items-center gap-3 rounded-xl border p-3 transition-colors ${
           isMe
-            ? 'bg-purple-700/50 border-purple-400/30 text-white hover:bg-purple-700/70'
-            : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+            ? 'border-purple-400/30 bg-purple-700/50 text-white hover:bg-purple-700/70'
+            : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
         }`}
       >
         <div
           className={
             isMe
-              ? 'bg-purple-500/30 p-2 rounded-lg'
-              : 'bg-white p-2 rounded-lg shadow-sm'
+              ? 'rounded-lg bg-purple-500/30 p-2'
+              : 'rounded-lg bg-white p-2 shadow-sm'
           }
         >
           <FileIcon
@@ -55,8 +55,8 @@ export const AttachmentItem = ({ attachment, isMe }: AttachmentItemProps) => {
             className={isMe ? 'text-purple-100' : 'text-purple-500'}
           />
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">{attachment.filename}</p>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium">{attachment.filename}</p>
           {attachment.size && (
             <p
               className={

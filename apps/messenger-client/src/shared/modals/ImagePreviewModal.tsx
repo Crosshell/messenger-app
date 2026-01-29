@@ -17,11 +17,11 @@ export const ImagePreviewModal = () => {
 
   return (
     <div
-      className="fixed inset-0 z-100 bg-black/90 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-200"
+      className="animate-in fade-in fixed inset-0 z-100 flex items-center justify-center bg-black/90 backdrop-blur-sm duration-200"
       onClick={() => setPreviewImage(null)}
     >
-      <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center text-white/80 z-10 bg-linear-to-b from-black/50 to-transparent">
-        <span className="text-sm font-medium truncate max-w-50">
+      <div className="absolute top-0 right-0 left-0 z-10 flex items-center justify-between bg-linear-to-b from-black/50 to-transparent p-4 text-white/80">
+        <span className="max-w-50 truncate text-sm font-medium">
           {previewImage.filename}
         </span>
 
@@ -31,14 +31,14 @@ export const ImagePreviewModal = () => {
             download={previewImage.filename}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 hover:bg-white/10 rounded-full transition-colors"
+            className="rounded-full p-2 transition-colors hover:bg-white/10"
             onClick={(e) => e.stopPropagation()}
           >
             <Download size={20} />
           </a>
           <button
             onClick={() => setPreviewImage(null)}
-            className="p-2 hover:bg-white/10 rounded-full transition-colors"
+            className="rounded-full p-2 transition-colors hover:bg-white/10"
           >
             <X size={24} />
           </button>
@@ -48,7 +48,7 @@ export const ImagePreviewModal = () => {
       <img
         src={previewImage.url}
         alt={previewImage.filename}
-        className="max-w-full max-h-screen object-contain p-4 transition-transform duration-300 scale-100"
+        className="max-h-screen max-w-full scale-100 object-contain p-4 transition-transform duration-300"
         onClick={(e) => e.stopPropagation()}
       />
     </div>

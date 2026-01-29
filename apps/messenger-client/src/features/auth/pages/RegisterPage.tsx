@@ -32,17 +32,17 @@ export const RegisterPage = () => {
   if (isSuccess) {
     return (
       <>
-        <h2 className="text-2xl font-bold text-green-600 mb-4">
+        <h2 className="mb-4 text-2xl font-bold text-green-600">
           Registration Successful!
         </h2>
 
-        <p className="text-gray-600 mb-6">
+        <p className="mb-6 text-gray-600">
           Confirmation email has been sent to your inbox
         </p>
 
         <NavLink
           to="/login"
-          className="text-blue-500 font-semibold hover:underline"
+          className="font-semibold text-blue-500 hover:underline"
         >
           Go to Login
         </NavLink>
@@ -52,13 +52,13 @@ export const RegisterPage = () => {
 
   return (
     <>
-      <div className="text-center mb-8">
+      <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-purple-950">Create Account</h1>
-        <p className="text-slate-400 mt-2">Your conversations start here</p>
+        <p className="mt-2 text-slate-400">Your conversations start here</p>
       </div>
 
       {errors.root && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm text-center">
+        <div className="mb-4 rounded-md bg-red-100 p-3 text-center text-sm text-red-700">
           {errors.root.message}
         </div>
       )}
@@ -96,7 +96,7 @@ export const RegisterPage = () => {
           error={errors.confirmPassword?.message}
         />
 
-        <Button type="submit" className="w-full mt-2" disabled={isPending}>
+        <Button type="submit" className="mt-2 w-full" disabled={isPending}>
           {isPending ? 'Loading...' : 'Register'}
         </Button>
       </form>
@@ -105,7 +105,7 @@ export const RegisterPage = () => {
         Already have an account?{' '}
         <NavLink
           to="/login"
-          className="text-blue-500 font-semibold hover:underline"
+          className="font-semibold text-blue-500 hover:underline"
         >
           Log in
         </NavLink>

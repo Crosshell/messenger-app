@@ -37,11 +37,7 @@ export const Button = ({
 
   return (
     <button
-      className={`
-        ${baseStyles}
-        ${variants[variant]} 
-        ${className}
-      `}
+      className={` ${baseStyles} ${variants[variant]} ${className} `}
       {...props}
     >
       <span className="relative z-10">{children}</span>

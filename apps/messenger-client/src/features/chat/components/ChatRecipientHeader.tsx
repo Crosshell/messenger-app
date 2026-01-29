@@ -17,39 +17,39 @@ export const ChatRecipientHeader = ({ chat }: ChatRecipientHeaderProps) => {
   if (!recipient) return null;
 
   return (
-    <div className="h-16 px-6 border-b border-slate-200 bg-white flex items-center justify-between shrink-0 z-10">
+    <div className="z-10 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden text-purple-600">
+        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-purple-100 text-purple-600">
           {recipient.avatarUrl ? (
             <img
               src={recipient.avatarUrl}
               alt={recipient.username}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
             />
           ) : (
             <UserIcon size={20} />
           )}
         </div>
         <div>
-          <h2 className="font-semibold text-slate-900 leading-tight">
+          <h2 className="leading-tight font-semibold text-slate-900">
             {recipient.username}
           </h2>
-          <span className="text-xs text-green-500 font-medium flex items-center gap-1">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+          <span className="flex items-center gap-1 text-xs font-medium text-green-500">
+            <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
             Online
           </span>
         </div>
       </div>
 
       <div className="flex items-center gap-1 text-slate-400">
-        <button className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+        <button className="rounded-full p-2 transition-colors hover:bg-slate-100">
           <Phone size={20} />
         </button>
-        <button className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+        <button className="rounded-full p-2 transition-colors hover:bg-slate-100">
           <Video size={20} />
         </button>
-        <div className="w-px h-6 bg-slate-200 mx-1" />
-        <button className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+        <div className="mx-1 h-6 w-px bg-slate-200" />
+        <button className="rounded-full p-2 transition-colors hover:bg-slate-100">
           <MoreVertical size={20} />
         </button>
       </div>

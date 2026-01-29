@@ -40,19 +40,19 @@ export const MessageBubble = ({ message, canMarkRead }: MessageBubbleProps) => {
     <div
       ref={ref}
       data-message-id={message.id}
-      className={`flex w-full mb-4 group/row ${isMe ? 'justify-end' : 'justify-start'}`}
+      className={`group/row mb-4 flex w-full ${isMe ? 'justify-end' : 'justify-start'}`}
       onMouseLeave={() => setShowMenu(false)}
     >
       {isMe && (
-        <div className="relative flex items-center mr-2 opacity-0 group-hover/row:opacity-100 transition-opacity">
+        <div className="relative mr-2 flex items-center opacity-0 transition-opacity group-hover/row:opacity-100">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full"
+            className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
             <MoreVertical size={16} />
           </button>
           {showMenu && (
-            <div className="absolute bottom-8 right-0 bg-white shadow-lg border border-slate-100 rounded-lg py-1 w-32 z-10 flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+            <div className="animate-in fade-in zoom-in-95 absolute right-0 bottom-8 z-10 flex w-32 flex-col overflow-hidden rounded-lg border border-slate-100 bg-white py-1 shadow-lg duration-100">
               <button
                 onClick={() => {
                   setMessageToEdit(message);
@@ -77,10 +77,10 @@ export const MessageBubble = ({ message, canMarkRead }: MessageBubbleProps) => {
       )}
 
       <div
-        className={`max-w-[70%] rounded-2xl shadow-sm relative group overflow-hidden ${
+        className={`group relative max-w-[70%] overflow-hidden rounded-2xl shadow-sm ${
           isMe
-            ? 'bg-purple-600 text-white rounded-br-none'
-            : 'bg-white rounded-bl-none border border-slate-100'
+            ? 'rounded-br-none bg-purple-600 text-white'
+            : 'rounded-bl-none border border-slate-100 bg-white'
         }`}
       >
         {message.attachments && message.attachments.length > 0 && (
@@ -96,14 +96,14 @@ export const MessageBubble = ({ message, canMarkRead }: MessageBubbleProps) => {
         )}
         <div className="px-4 py-2">
           {message.content && (
-            <p className="whitespace-pre-wrap wrap-break-word text-sm leading-relaxed mb-1">
+            <p className="mb-1 text-sm leading-relaxed wrap-break-word whitespace-pre-wrap">
               {message.content}
             </p>
           )}
           <div
-            className={`flex items-center justify-end gap-1 text-[10px] select-none mt-1 ${isMe ? 'text-purple-200' : 'text-slate-400'}`}
+            className={`mt-1 flex items-center justify-end gap-1 text-[10px] select-none ${isMe ? 'text-purple-200' : 'text-slate-400'}`}
           >
-            {message.isEdited && <span className="italic mr-1">edited</span>}
+            {message.isEdited && <span className="mr-1 italic">edited</span>}
             <span>{formatMessageDate(message.createdAt)}</span>
             {isMe &&
               (message.isRead ? (
