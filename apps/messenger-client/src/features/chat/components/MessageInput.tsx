@@ -1,156 +1,48 @@
-import React, { type KeyboardEvent, useEffect, useRef, useState } from 'react';
-import { Check, Loader2, Paperclip, Send, Smile, X } from 'lucide-react';
-import { useSendMessage } from '../hooks/use-send-message.ts';
-import { useChatStore } from '../model/chat.store.ts';
-import { useMessageActions } from '../hooks/use-message-actions.ts';
-import { useAttachments } from '../hooks/use-attachments.ts';
-import { AttachmentPreview } from './AttachmentPreview.tsx';
+import type { ChangeEvent } from 'react';
+import { Paperclip, Smile } from 'lucide-react';
+import { useAttachments } from '../hooks/use-attachments';
+import { AttachmentPreview } from './AttachmentPreview';
+import { useMessageInput } from '../hooks/use-message-input';
+import { EditBanner } from './message-input/EditBanner';
+import { SendButton } from './message-input/SendButton';
 
 interface MessageInputProps {
   chatId: string;
   attachmentState: ReturnType<typeof useAttachments>;
 }
 
-const MAX_LENGTH = 3000;
-
 export const MessageInput = ({
   chatId,
   attachmentState,
 }: MessageInputProps) => {
-  const [content, setContent] = useState('');
+  const {
+    content,
+    textareaRef,
+    fileInputRef,
+    isSubmitDisabled,
+    isUploading,
+    messageToEdit,
+    maxLength,
+    actions,
+  } = useMessageInput({ chatId, attachmentState });
 
   const {
     files,
     existingAttachments,
-    addFiles,
     removeFile,
-    clearFiles,
-    uploadFiles,
-    isUploading,
+    removeExistingAttachment,
     error: uploadError,
   } = attachmentState;
 
-  const { sendMessage } = useSendMessage(chatId);
-  const { editMessage } = useMessageActions(chatId);
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const { messageToEdit, setMessageToEdit } = useChatStore();
-
-  const hasChanges = () => {
-    if (!messageToEdit) return true;
-
-    const oldContent = messageToEdit.content || '';
-    const newContent = content.trim();
-    if (oldContent !== newContent) return true;
-
-    if (files.length > 0) return true;
-
-    const oldIds =
-      messageToEdit.attachments
-        ?.map((a) => a.id)
-        .sort()
-        .join(',') || '';
-    const currentIds = existingAttachments
-      .map((a) => a.id)
-      .sort()
-      .join(',');
-
-    return oldIds !== currentIds;
-  };
-
-  useEffect(() => {
-    if (messageToEdit) {
-      setContent(messageToEdit.content ?? '');
-      if (messageToEdit.attachments) {
-        attachmentState.loadAttachments(messageToEdit.attachments);
-      }
-      textareaRef.current?.focus();
-    }
-  }, [messageToEdit]);
-
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [content]);
-
-  const isMessageEmpty =
-    !content.trim() && files.length === 0 && existingAttachments.length === 0;
-
-  const isSubmitDisabled =
-    isMessageEmpty || isUploading || (messageToEdit && !hasChanges());
-
-  const handleSubmit = async () => {
-    if (isMessageEmpty) return;
-
-    try {
-      const newAttachments = await uploadFiles();
-
-      if (messageToEdit) {
-        const finalAttachments = [...existingAttachments, ...newAttachments];
-        editMessage(messageToEdit.id, content.trim(), finalAttachments);
-      } else {
-        sendMessage(content, newAttachments);
-      }
-
-      setContent('');
-      clearFiles();
-
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
-        textareaRef.current.focus();
-      }
-    } catch (e) {
-      console.error('Failed to send message', e);
-    }
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (!isSubmitDisabled) {
-        handleSubmit();
-      }
-    }
-    if (e.key === 'Escape' && messageToEdit) {
-      cancelEdit();
-    }
-  };
-
-  const cancelEdit = () => {
-    setMessageToEdit(null);
-    setContent('');
-    clearFiles();
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      addFiles(e.target.files);
+      actions.addFiles(e.target.files);
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handlePaste = (e: React.ClipboardEvent) => {
-    if (e.clipboardData.files.length > 0) {
-      e.preventDefault();
-      addFiles(e.clipboardData.files);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    if (value.length <= MAX_LENGTH) {
-      setContent(value);
-    } else {
-      setContent(value.slice(0, MAX_LENGTH));
-    }
-  };
-
   return (
-    <div className="bg-white border-t border-slate-200">
+    <div className="relative border-t border-slate-200 bg-white">
       <input
         type="file"
         multiple
@@ -160,42 +52,32 @@ export const MessageInput = ({
       />
 
       {messageToEdit && (
-        <div className="absolute -top-10 left-0 w-full bg-slate-50 border-t border-slate-200 px-4 py-2 flex items-center justify-between text-sm text-slate-600 animate-in slide-in-from-bottom-2">
-          <span className="flex items-center gap-2 truncate">
-            <span className="font-semibold text-purple-600">Editing:</span>
-            <span className="truncate max-w-50 opacity-70">
-              {messageToEdit.content || '(Attachment)'}
-            </span>
-          </span>
-          <button
-            onClick={cancelEdit}
-            className="text-slate-400 hover:text-red-500"
-          >
-            <X size={16} />
-          </button>
-        </div>
+        <EditBanner
+          message={messageToEdit}
+          onCancel={actions.handleCancelEdit}
+        />
       )}
 
       <AttachmentPreview
         files={files}
-        existingAttachments={attachmentState.existingAttachments}
+        existingAttachments={existingAttachments}
         onRemoveNew={removeFile}
-        onRemoveExisting={attachmentState.removeExistingAttachment}
+        onRemoveExisting={removeExistingAttachment}
         disabled={isUploading}
       />
 
       {uploadError && (
-        <div className="px-4 py-1 text-xs text-red-500 bg-red-50 border-t border-red-100">
+        <div className="border-t border-red-100 bg-red-50 px-4 py-1 text-xs text-red-500">
           {uploadError}
         </div>
       )}
 
-      <div className="p-4 flex flex-col gap-1">
-        <div className="flex items-end gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 focus-within:border-purple-400 focus-within:ring-1 focus-within:ring-purple-400 transition-all">
+      <div className="flex flex-col gap-1 p-4">
+        <div className="flex items-end gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2 transition-all focus-within:border-purple-400 focus-within:ring-1 focus-within:ring-purple-400">
           <button
             disabled={!!messageToEdit || isUploading}
-            onClick={() => fileInputRef.current?.click()}
-            className="p-2 text-slate-400 hover:text-purple-600 transition-colors rounded-full hover:bg-slate-200 mb-0.5 disabled:opacity-50"
+            onClick={actions.triggerFileUpload}
+            className="mb-0.5 rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-200 hover:text-purple-600 disabled:opacity-50"
           >
             <Paperclip size={20} />
           </button>
@@ -203,50 +85,37 @@ export const MessageInput = ({
           <textarea
             ref={textareaRef}
             value={content}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-            maxLength={MAX_LENGTH}
+            onChange={actions.handleChange}
+            onKeyDown={actions.handleKeyDown}
+            onPaste={actions.handlePaste}
+            maxLength={maxLength}
             placeholder={
               messageToEdit ? 'Edit your message...' : 'Type a message...'
             }
             rows={1}
-            className="outline-none flex-1 max-h-32 bg-transparent border-none focus:ring-0 resize-none py-3 text-slate-800 placeholder:text-slate-400 custom-scrollbar"
+            className="custom-scrollbar max-h-32 flex-1 resize-none border-none bg-transparent py-3 text-slate-800 outline-none placeholder:text-slate-400 focus:ring-0"
           />
 
-          <button className="p-2 text-slate-400 hover:text-yellow-500 transition-colors rounded-full hover:bg-slate-200 mb-0.5">
+          <button className="mb-0.5 rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-200 hover:text-yellow-500">
             <Smile size={20} />
           </button>
 
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitDisabled ?? false}
-            className={`p-2 text-white rounded-xl transition-all shadow-sm mb-0.5 ${
-              isSubmitDisabled
-                ? 'bg-slate-400 cursor-not-allowed opacity-50'
-                : messageToEdit
-                  ? 'bg-green-500 hover:bg-green-600'
-                  : 'bg-purple-600 hover:bg-purple-700'
-            }`}
-          >
-            {isUploading ? (
-              <Loader2 size={20} className="animate-spin" />
-            ) : messageToEdit ? (
-              <Check size={20} />
-            ) : (
-              <Send size={20} />
-            )}
-          </button>
+          <SendButton
+            isUploading={isUploading}
+            isEditing={!!messageToEdit}
+            disabled={isSubmitDisabled}
+            onClick={actions.handleSend}
+          />
         </div>
 
         <div
-          className={`text-[10px] text-right px-1 transition-colors ${
-            content.length >= MAX_LENGTH
-              ? 'text-red-500 font-bold'
+          className={`px-1 text-right text-[10px] transition-colors ${
+            content.length >= maxLength
+              ? 'font-bold text-red-500'
               : 'text-slate-400'
           }`}
         >
-          {content.length}/{MAX_LENGTH}
+          {content.length}/{maxLength}
         </div>
       </div>
     </div>
