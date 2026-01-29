@@ -6,6 +6,6 @@ export class SendMessageDto {
   chatId: string;
 
   @IsString()
-  @Length(1, 1024)
+  @Length(1, 3000)
   content: string;
 }

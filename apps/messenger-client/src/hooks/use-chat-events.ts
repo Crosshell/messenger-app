@@ -55,6 +55,9 @@ export const useChatEvents = () => {
       queryClient.invalidateQueries({ queryKey: ['chats'] });
     };
 
+    socket.on('exception', (error) =>
+      console.error('Socket Exception:', error),
+    );
     socket.on('chatListUpdate', handleChatListUpdate);
     socket.on('messagesRead', handleMessagesRead);
     socket.on('messageUpdated', handleMessageUpdated);

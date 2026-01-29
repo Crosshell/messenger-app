@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
+import React, { useState, useRef, useEffect, type KeyboardEvent } from 'react';
 import { Send, Paperclip, Smile, X, Check } from 'lucide-react';
 import { useSendMessage } from '../../hooks/use-send-message';
 import { useChatStore } from '../../store/chat.store';
@@ -7,6 +7,8 @@ import { useMessageActions } from '../../hooks/use-message-actions';
 interface MessageInputProps {
   chatId: string;
 }
+
+const MAX_LENGTH = 3000;
 
 export const MessageInput = ({ chatId }: MessageInputProps) => {
   const [content, setContent] = useState('');
@@ -62,6 +64,15 @@ export const MessageInput = ({ chatId }: MessageInputProps) => {
     setContent('');
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    if (value.length <= MAX_LENGTH) {
+      setContent(value);
+    } else {
+      setContent(value.slice(0, MAX_LENGTH));
+    }
+  };
+
   return (
     <div className="p-4 bg-white border-t border-slate-200">
       {messageToEdit && (
@@ -81,37 +92,54 @@ export const MessageInput = ({ chatId }: MessageInputProps) => {
         </div>
       )}
 
-      <div className="flex items-end gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 focus-within:border-purple-400 focus-within:ring-1 focus-within:ring-purple-400 transition-all">
-        <button
-          disabled={!!messageToEdit}
-          className="p-2 text-slate-400 hover:text-purple-600 transition-colors rounded-full hover:bg-slate-200 mb-0.5 disabled:opacity-50"
+      <div className="flex flex-col gap-1">
+        <div className="flex items-end gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 focus-within:border-purple-400 focus-within:ring-1 focus-within:ring-purple-400 transition-all">
+          <button
+            disabled={!!messageToEdit}
+            className="p-2 text-slate-400 hover:text-purple-600 transition-colors rounded-full hover:bg-slate-200 mb-0.5 disabled:opacity-50"
+          >
+            <Paperclip size={20} />
+          </button>
+
+          <textarea
+            ref={textareaRef}
+            value={content}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            maxLength={MAX_LENGTH}
+            placeholder={
+              messageToEdit ? 'Edit your message...' : 'Type a message...'
+            }
+            rows={1}
+            className="outline-none flex-1 max-h-32 bg-transparent border-none focus:ring-0 resize-none py-3 text-slate-800 placeholder:text-slate-400 custom-scrollbar"
+          />
+
+          <button className="p-2 text-slate-400 hover:text-yellow-500 transition-colors rounded-full hover:bg-slate-200 mb-0.5">
+            <Smile size={20} />
+          </button>
+
+          <button
+            onClick={handleSubmit}
+            disabled={!content.trim()}
+            className={`p-2 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm mb-0.5 ${
+              messageToEdit
+                ? 'bg-green-500 hover:bg-green-600'
+                : 'bg-purple-600 hover:bg-purple-700'
+            }`}
+          >
+            {messageToEdit ? <Check size={20} /> : <Send size={20} />}
+          </button>
+        </div>
+
+        <div
+          className={`text-[10px] text-right px-1 transition-colors ${
+            content.length >= MAX_LENGTH
+              ? 'text-red-500 font-bold'
+              : 'text-slate-400'
+          }`}
         >
-          <Paperclip size={20} />
-        </button>
-
-        <textarea
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={
-            messageToEdit ? 'Edit your message...' : 'Type a message...'
-          }
-          rows={1}
-          className="outline-none flex-1 max-h-32 bg-transparent border-none focus:ring-0 resize-none py-3 text-slate-800 placeholder:text-slate-400 custom-scrollbar"
-        />
-
-        <button className="p-2 text-slate-400 hover:text-yellow-500 transition-colors rounded-full hover:bg-slate-200 mb-0.5">
-          <Smile size={20} />
-        </button>
-
-        <button
-          onClick={handleSubmit}
-          disabled={!content.trim()}
-          className={`p-2 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm mb-0.5 ${messageToEdit ? 'bg-green-500 hover:bg-green-600' : 'bg-purple-600 hover:bg-purple-700'}`}
-        >
-          {messageToEdit ? <Check size={20} /> : <Send size={20} />}
-        </button>
+          {content.length}/{MAX_LENGTH}
+        </div>
       </div>
     </div>
   );

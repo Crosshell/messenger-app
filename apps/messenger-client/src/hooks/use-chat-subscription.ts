@@ -10,7 +10,13 @@ export const useChatSubscription = (chatId: string) => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.emit('joinChat', chatId);
+    const joinRoom = () => {
+      socket.emit('joinChat', chatId);
+    };
+
+    joinRoom();
+
+    socket.on('connect', joinRoom);
 
     const handleNewMessage = (newMessage: Message) => {
       if (newMessage.chatId !== chatId) return;
@@ -26,6 +32,9 @@ export const useChatSubscription = (chatId: string) => {
           }
 
           const newPages = [...oldData.pages];
+          if (newPages[0].some((msg) => msg.id === newMessage.id)) {
+            return oldData;
+          }
 
           newPages[0] = [newMessage, ...newPages[0]];
 
@@ -40,6 +49,7 @@ export const useChatSubscription = (chatId: string) => {
     socket.on('newMessage', handleNewMessage);
 
     return () => {
+      socket.off('connect', joinRoom);
       socket.off('newMessage', handleNewMessage);
     };
   }, [socket, chatId, queryClient]);
