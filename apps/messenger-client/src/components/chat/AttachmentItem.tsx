@@ -1,5 +1,6 @@
 import type { Attachment } from '../../types/attachment.type.ts';
 import { FileIcon } from 'lucide-react';
+import { useUIStore } from '../../store/ui.store.ts';
 
 interface AttachmentItemProps {
   attachment: Attachment;
@@ -7,15 +8,23 @@ interface AttachmentItemProps {
 }
 
 export const AttachmentItem = ({ attachment, isMe }: AttachmentItemProps) => {
-  const isImage = attachment.mimeType?.startsWith('image/');
+  const setPreviewImage = useUIStore((state) => state.setPreviewImage);
 
+  const isImage = attachment.mimeType?.startsWith('image/');
   if (isImage) {
     return (
       <div className="w-full">
         <img
           src={attachment.url}
           alt={attachment.filename}
-          className="w-full max-h-96 object-cover cursor-pointer hover:brightness-90 transition-all"
+          draggable={false}
+          onClick={() =>
+            setPreviewImage({
+              url: attachment.url,
+              filename: attachment.filename,
+            })
+          }
+          className="w-full max-h-96 object-cover cursor-zoom-in hover:brightness-90 transition-all select-none"
           loading="lazy"
         />
       </div>
