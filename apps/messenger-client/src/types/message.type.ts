@@ -1,8 +1,9 @@
 import type { User } from './user.type';
+import type { Attachment } from './attachment.type.ts';
 
 export interface Message {
   id: string;
-  content: string;
+  content?: string;
   createdAt: string;
   updatedAt: string;
   senderId: string;
@@ -10,4 +11,5 @@ export interface Message {
   isRead: boolean;
   isEdited: boolean;
   sender?: User;
+  attachments?: Attachment[];
 }

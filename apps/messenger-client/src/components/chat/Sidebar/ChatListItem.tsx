@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Check, CheckCheck, User as UserIcon } from 'lucide-react';
+import { Check, CheckCheck, Paperclip, User as UserIcon } from 'lucide-react';
 import type { Chat } from '../../../types/chat.type';
 import { useAuthStore } from '../../../store/auth.store';
 import { useChatStore } from '../../../store/chat.store';
@@ -27,6 +27,28 @@ export const ChatListItem = ({ chat }: ChatListItemProps) => {
 
   const isMyLastMessage = lastMessage?.senderId === currentUserId;
   const isMessageRead = lastMessage?.isRead;
+
+  const messagePreview = useMemo(() => {
+    if (!lastMessage)
+      return <span className="italic text-slate-400">No messages yet</span>;
+
+    if (lastMessage.content) {
+      return <span className="truncate">{lastMessage.content}</span>;
+    }
+
+    if (lastMessage.attachments && lastMessage.attachments.length > 0) {
+      return (
+        <span className="flex items-center gap-1 text-slate-500 italic">
+          <Paperclip size={12} />
+          {lastMessage.attachments.length > 1
+            ? `${lastMessage.attachments.length} files`
+            : 'File'}
+        </span>
+      );
+    }
+
+    return <span className="italic text-slate-400">Empty message</span>;
+  }, [lastMessage]);
 
   return (
     <button
@@ -61,23 +83,18 @@ export const ChatListItem = ({ chat }: ChatListItemProps) => {
 
         <div className="flex items-center justify-between gap-2">
           <p className="text-sm text-slate-500 truncate flex-1 flex items-center">
-            {lastMessage ? (
-              <>
-                {isMyLastMessage && (
-                  <span className="mr-1 flex items-center shrink-0">
-                    <span className="text-purple-600 mr-1">You:</span>
-                    {isMessageRead ? (
-                      <CheckCheck size={14} className="text-blue-500" />
-                    ) : (
-                      <Check size={14} className="text-slate-400" />
-                    )}
-                  </span>
+            {lastMessage && isMyLastMessage && (
+              <span className="mr-1 flex items-center shrink-0">
+                <span className="text-purple-600 mr-1">You:</span>
+                {isMessageRead ? (
+                  <CheckCheck size={14} className="text-blue-500" />
+                ) : (
+                  <Check size={14} className="text-slate-400" />
                 )}
-                <span className="truncate">{lastMessage.content}</span>
-              </>
-            ) : (
-              <span className="italic text-slate-400">No messages yet</span>
+              </span>
             )}
+
+            {messagePreview}
           </p>
 
           {chat.unreadCount > 0 && (

@@ -65,6 +65,7 @@ export class ChatService {
         messages: {
           take: 1,
           orderBy: { createdAt: 'desc' },
+          include: { attachments: true },
         },
         _count: {
           select: {
@@ -111,6 +112,7 @@ export class ChatService {
       skip: cursor ? 1 : 0,
       include: {
         sender: { select: { id: true, username: true, avatarUrl: true } },
+        attachments: true,
       },
       orderBy: { createdAt: 'desc' },
     });

@@ -1,17 +1,21 @@
 import { useCallback } from 'react';
 import { useSocket } from './use-socket';
+import type { Attachment } from '../types/attachment.type';
 
 export const useSendMessage = (chatId: string) => {
   const socket = useSocket();
 
   const sendMessage = useCallback(
-    (content: string) => {
-      if (!socket || !content.trim()) return;
+    (content: string, attachments: Attachment[] = []) => {
+      if (!socket) return;
 
-      socket.emit('sendMessage', {
+      const payload = {
         chatId,
         content: content.trim(),
-      });
+        attachments,
+      };
+
+      socket.emit('sendMessage', payload);
     },
     [socket, chatId],
   );

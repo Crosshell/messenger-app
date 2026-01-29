@@ -7,6 +7,7 @@ import { EmailModule } from './email/email.module';
 import { TokenModule } from './token/token.module';
 import config from './config/config';
 import { ChatModule } from './chat/chat.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ChatModule } from './chat/chat.module';
     EmailModule,
     TokenModule,
     ChatModule,
+    StorageModule,
   ],
 })
 export class AppModule {}

@@ -9,6 +9,7 @@ import { ResendVerificationPage } from './pages/ResendVerificationPage';
 import { ChatPage } from './pages/ChatPage';
 import { ProtectedRoute } from './components/routes/ProtectedRoute';
 import { useAutoRefresh } from './hooks/use-auto-refresh.ts';
+import { SocketProvider } from './context/SocketContext.tsx';
 
 export default function App() {
   useAutoRefresh();
@@ -27,9 +28,17 @@ export default function App() {
             element={<ResendVerificationPage />}
           />
         </Route>
-        <Route element={<ProtectedRoute />}>
+
+        <Route
+          element={
+            <SocketProvider>
+              <ProtectedRoute />
+            </SocketProvider>
+          }
+        >
           <Route path="/chat" element={<ChatPage />} />
         </Route>
+
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </>

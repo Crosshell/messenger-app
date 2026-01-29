@@ -1,4 +1,13 @@
-import { IsString, IsUUID, Length } from 'class-validator';
+import {
+  IsArray,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { AttachmentDto } from './attachment.dto';
 
 export class SendMessageDto {
   @IsString()
@@ -6,6 +15,13 @@ export class SendMessageDto {
   chatId: string;
 
   @IsString()
-  @Length(1, 3000)
-  content: string;
+  @IsOptional()
+  @Length(0, 3000)
+  content?: string;
+
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => AttachmentDto)
+  attachments?: AttachmentDto[];
 }

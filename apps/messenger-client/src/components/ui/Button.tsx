@@ -2,7 +2,7 @@ import React from 'react';
 
 type ButtonVariant = 'primary' | 'outline';
 
-interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   variant?: ButtonVariant;
 }
@@ -12,7 +12,7 @@ export const Button = ({
   className,
   variant = 'primary',
   ...props
-}: Props) => {
+}: ButtonProps) => {
   const baseStyles = `relative w-full py-3 px-4 overflow-hidden
     font-bold tracking-wide rounded-full
     transition-all duration-300 ease-out
