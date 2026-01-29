@@ -1,58 +1,41 @@
 import { useEffect } from 'react';
-import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
-import { useSocket } from '@shared/hooks/use-socket.ts';
-import { useChatStore } from '../model/chat.store.ts';
-import type { Message } from '../model/types/message.type.ts';
-import type { MessagesReadResponse } from '../model/types/responses/messages-read.response.ts';
-import type { MessageDeletedResponse } from '../model/types/responses/message-deleted.response.ts';
-import {
-  removeMessageOnDelete,
-  updateMessageOnEdit,
-  updateMessagesOnRead,
-} from '../utils/chat-cache-updaters.ts';
+import { useSocket } from '@shared/hooks/use-socket';
+import { useChatStore } from '../model/chat.store';
+import type { Message } from '../model/types/message.type';
+import type { MessagesReadResponse } from '../model/types/responses/messages-read.response';
+import type { MessageDeletedResponse } from '../model/types/responses/message-deleted.response';
+import { useChatCacheUpdaters } from './use-chat-cache-updaters';
 
 export const useChatEvents = () => {
   const socket = useSocket();
-  const queryClient = useQueryClient();
   const activeChatId = useChatStore((state) => state.activeChatId);
+
+  const {
+    markMessagesAsReadInCache,
+    updateMessageInCache,
+    removeMessageFromCache,
+    invalidateChatsList,
+  } = useChatCacheUpdaters();
 
   useEffect(() => {
     if (!socket) return;
 
-    const handleChatListUpdate = () => {
-      queryClient.invalidateQueries({ queryKey: ['chats'] });
-    };
+    const handleChatListUpdate = () => invalidateChatsList();
 
     const handleMessagesRead = ({ chatId, readAt }: MessagesReadResponse) => {
-      const readUntilTimestamp = new Date(readAt).getTime();
-      if (isNaN(readUntilTimestamp)) return;
-
-      queryClient.setQueryData<InfiniteData<Message[]>>(
-        ['messages', chatId],
-        (old) => updateMessagesOnRead(old, readUntilTimestamp),
-      );
-
-      queryClient.invalidateQueries({ queryKey: ['chats'] });
+      markMessagesAsReadInCache(chatId, readAt);
     };
 
     const handleMessageUpdated = (updatedMessage: Message) => {
-      queryClient.setQueryData<InfiniteData<Message[]>>(
-        ['messages', updatedMessage.chatId],
-        (old) => updateMessageOnEdit(old, updatedMessage),
-      );
-
-      queryClient.invalidateQueries({ queryKey: ['chats'] });
+      updateMessageInCache(updatedMessage);
     };
 
     const handleMessageDeleted = (payload: MessageDeletedResponse) => {
       if (activeChatId === payload.chatId) {
-        queryClient.setQueryData<InfiniteData<Message[]>>(
-          ['messages', payload.chatId],
-          (old) => removeMessageOnDelete(old, payload.messageId),
-        );
+        removeMessageFromCache(payload.chatId, payload.messageId);
+      } else {
+        invalidateChatsList();
       }
-
-      queryClient.invalidateQueries({ queryKey: ['chats'] });
     };
 
     socket.on('exception', (error) =>
@@ -69,5 +52,12 @@ export const useChatEvents = () => {
       socket.off('messageUpdated', handleMessageUpdated);
       socket.off('messageDeleted', handleMessageDeleted);
     };
-  }, [socket, queryClient, activeChatId]);
+  }, [
+    socket,
+    activeChatId,
+    markMessagesAsReadInCache,
+    updateMessageInCache,
+    removeMessageFromCache,
+    invalidateChatsList,
+  ]);
 };

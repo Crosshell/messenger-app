@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import type { Message } from '../model/types/message.type.ts';
+import type { Message } from '../model/types/message.type';
 
 export const useChatScroll = (
   chatId: string,
@@ -42,6 +42,7 @@ export const useChatScroll = (
       setIsReady(true);
       return;
     }
+
     if (!containerRef.current || messages.length === 0) return;
 
     const currentLength = messages.length;
@@ -51,15 +52,16 @@ export const useChatScroll = (
       const firstUnread = messages.find(
         (m) => !m.isRead && m.senderId !== currentUserId,
       );
-      const targetElement = firstUnread
-        ? (containerRef.current.querySelector(
-            `[data-message-id="${firstUnread.id}"]`,
-          ) as HTMLElement)
-        : null;
 
-      if (targetElement) {
-        containerRef.current.scrollTop = targetElement.offsetTop - 60;
-        setIsAtBottom(false);
+      if (firstUnread) {
+        const targetElement = containerRef.current.querySelector(
+          `[data-message-id="${firstUnread.id}"]`,
+        ) as HTMLElement;
+
+        if (targetElement) {
+          containerRef.current.scrollTop = targetElement.offsetTop - 60;
+          setIsAtBottom(false);
+        }
       } else {
         containerRef.current.scrollTop = containerRef.current.scrollHeight;
       }
@@ -74,6 +76,7 @@ export const useChatScroll = (
     } else {
       const isNew = lastMessage?.id !== prevLastMessageIdRef.current;
       const isMe = lastMessage?.senderId === currentUserId;
+
       if (isNew && (isMe || isAtBottom)) {
         containerRef.current.scrollTo({
           top: containerRef.current.scrollHeight,

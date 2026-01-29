@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
-import { useSocket } from '@shared/hooks/use-socket.ts';
-import type { Message } from '../model/types/message.type.ts';
+import { useSocket } from '@shared/hooks/use-socket';
+import type { Message } from '../model/types/message.type';
+import { useChatCacheUpdaters } from './use-chat-cache-updaters';
 
 export const useChatSubscription = (chatId: string) => {
   const socket = useSocket();
-  const queryClient = useQueryClient();
+  const { addMessageToCache } = useChatCacheUpdaters();
 
   useEffect(() => {
     if (!socket) return;
@@ -15,35 +15,11 @@ export const useChatSubscription = (chatId: string) => {
     };
 
     joinRoom();
-
     socket.on('connect', joinRoom);
 
     const handleNewMessage = (newMessage: Message) => {
       if (newMessage.chatId !== chatId) return;
-
-      queryClient.setQueryData<InfiniteData<Message[]>>(
-        ['messages', chatId],
-        (oldData) => {
-          if (!oldData || oldData.pages.length === 0) {
-            return {
-              pages: [[newMessage]],
-              pageParams: [undefined],
-            };
-          }
-
-          const newPages = [...oldData.pages];
-          if (newPages[0].some((msg) => msg.id === newMessage.id)) {
-            return oldData;
-          }
-
-          newPages[0] = [newMessage, ...newPages[0]];
-
-          return {
-            ...oldData,
-            pages: newPages,
-          };
-        },
-      );
+      addMessageToCache(chatId, newMessage);
     };
 
     socket.on('newMessage', handleNewMessage);
@@ -52,5 +28,5 @@ export const useChatSubscription = (chatId: string) => {
       socket.off('connect', joinRoom);
       socket.off('newMessage', handleNewMessage);
     };
-  }, [socket, chatId, queryClient]);
+  }, [socket, chatId, addMessageToCache]);
 };
