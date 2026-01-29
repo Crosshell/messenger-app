@@ -6,15 +6,19 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 export function getEmailConfig(config: ConfigService): MailerOptions {
   return {
     transport: {
-      service: config.getOrThrow<string>('email.service'),
-      secure: false,
+      host: config.getOrThrow<string>('email.host'),
+      port: config.getOrThrow<number>('email.port'),
+      secure: config.get<boolean>('email.secure'),
       auth: {
         user: config.getOrThrow<string>('email.user'),
         pass: config.getOrThrow<string>('email.password'),
       },
+      tls: {
+        rejectUnauthorized: false,
+      },
     },
     defaults: {
-      from: '"No Reply" <no-reply@messenger.com>',
+      from: `"No Reply" <${config.getOrThrow('email.from')}>`,
     },
     template: {
       dir: join(process.cwd(), 'templates'),

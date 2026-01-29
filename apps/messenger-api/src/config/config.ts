@@ -2,9 +2,12 @@ export default () => ({
   port: (process.env.PORT && parseInt(process.env.PORT, 10)) || 3000,
   clientBaseUrl: process.env.CLIENT_BASE_URL || '',
   email: {
-    service: process.env.SMTP_SERVICE,
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT && parseInt(process.env.EMAIL_PORT, 10),
+    secure: process.env.EMAIL_SECURE === 'true',
     user: process.env.SMTP_USERNAME,
     password: process.env.SMTP_PASSWORD,
+    from: process.env.EMAIL_FROM || '',
   },
   jwt: {
     secret: process.env.JWT_SECRET,
