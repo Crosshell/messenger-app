@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { MoreVertical, Phone, User as UserIcon, Video } from 'lucide-react';
 import { useAuthStore } from '@features/auth/model/auth.store.ts';
 import type { Chat } from '@features/chat/model/types/chat.type.ts';
+import { getChatRecipient } from '@features/chat/utils/get-chat-recipient';
 
 interface ChatRecipientHeaderProps {
   chat: Chat;
@@ -10,9 +11,10 @@ interface ChatRecipientHeaderProps {
 export const ChatRecipientHeader = ({ chat }: ChatRecipientHeaderProps) => {
   const currentUserId = useAuthStore((state) => state.userId);
 
-  const recipient = useMemo(() => {
-    return chat.members.find((m) => m.user.id !== currentUserId)?.user;
-  }, [chat.members, currentUserId]);
+  const recipient = useMemo(
+    () => getChatRecipient(chat, currentUserId),
+    [chat, currentUserId],
+  );
 
   if (!recipient) return null;
 

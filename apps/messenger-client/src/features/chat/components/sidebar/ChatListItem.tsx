@@ -1,9 +1,11 @@
 import { useMemo } from 'react';
-import { Check, CheckCheck, Paperclip, User as UserIcon } from 'lucide-react';
-import type { Chat } from '../../model/types/chat.type.ts';
-import { useAuthStore } from '../../../auth/model/auth.store.ts';
-import { useChatStore } from '../../model/chat.store.ts';
-import { formatMessageDate } from '@shared/utils/date.util.ts';
+import { Check, CheckCheck, User as UserIcon } from 'lucide-react';
+import type { Chat } from '../../model/types/chat.type';
+import { useAuthStore } from '../../../auth/model/auth.store';
+import { useChatStore } from '../../model/chat.store';
+import { formatMessageDate } from '@shared/utils/date.util';
+import { getChatRecipient } from '../../utils/get-chat-recipient';
+import { LastMessagePreview } from './LastMessagePreview';
 
 interface ChatListItemProps {
   chat: Chat;
@@ -13,42 +15,16 @@ export const ChatListItem = ({ chat }: ChatListItemProps) => {
   const currentUserId = useAuthStore((state) => state.userId);
   const { activeChatId, setActiveChatId } = useChatStore();
 
-  const targetUser = useMemo(() => {
-    if (!chat.members) return null;
-    const member = chat.members.find((m) => m.user.id !== currentUserId);
-    return member ? member.user : chat.members[0]?.user;
-  }, [chat.members, currentUserId]);
-
-  const username = targetUser?.username || 'Unknown User';
-  const avatarUrl = targetUser?.avatarUrl;
+  const recipient = useMemo(
+    () => getChatRecipient(chat, currentUserId),
+    [chat, currentUserId],
+  );
 
   const lastMessage = chat.messages?.[0];
   const isActive = activeChatId === chat.id;
-
   const isMyLastMessage = lastMessage?.senderId === currentUserId;
-  const isMessageRead = lastMessage?.isRead;
 
-  const messagePreview = useMemo(() => {
-    if (!lastMessage)
-      return <span className="text-slate-400 italic">No messages yet</span>;
-
-    if (lastMessage.content) {
-      return <span className="truncate">{lastMessage.content}</span>;
-    }
-
-    if (lastMessage.attachments && lastMessage.attachments.length > 0) {
-      return (
-        <span className="flex items-center gap-1 text-slate-500 italic">
-          <Paperclip size={12} />
-          {lastMessage.attachments.length > 1
-            ? `${lastMessage.attachments.length} files`
-            : 'File'}
-        </span>
-      );
-    }
-
-    return <span className="text-slate-400 italic">Empty message</span>;
-  }, [lastMessage]);
+  const username = recipient?.username || 'Unknown User';
 
   return (
     <button
@@ -57,9 +33,9 @@ export const ChatListItem = ({ chat }: ChatListItemProps) => {
     >
       <div className="relative shrink-0">
         <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-slate-200 text-slate-500">
-          {targetUser?.avatarUrl ? (
+          {recipient?.avatarUrl ? (
             <img
-              src={avatarUrl}
+              src={recipient.avatarUrl}
               alt={username}
               className="h-full w-full object-cover"
             />
@@ -83,10 +59,10 @@ export const ChatListItem = ({ chat }: ChatListItemProps) => {
 
         <div className="flex items-center justify-between gap-2">
           <p className="flex flex-1 items-center truncate text-sm text-slate-500">
-            {lastMessage && isMyLastMessage && (
-              <span className="mr-1 flex shrink-0 items-center">
+            {isMyLastMessage && (
+              <span className="mr-1 flex shrink-0 items-center gap-1">
                 <span className="mr-1 text-purple-600">You:</span>
-                {isMessageRead ? (
+                {lastMessage?.isRead ? (
                   <CheckCheck size={14} className="text-blue-500" />
                 ) : (
                   <Check size={14} className="text-slate-400" />
@@ -94,7 +70,7 @@ export const ChatListItem = ({ chat }: ChatListItemProps) => {
               </span>
             )}
 
-            {messagePreview}
+            <LastMessagePreview message={lastMessage} />
           </p>
 
           {chat.unreadCount > 0 && (

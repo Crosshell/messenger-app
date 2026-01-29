@@ -4,6 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { useChatList } from '../../hooks/use-chat-list.ts';
 import { ChatListItem } from './ChatListItem.tsx';
 import { useAuthStore } from '../../../auth/model/auth.store.ts';
+import { getChatRecipient } from '@features/chat/utils/get-chat-recipient';
 
 interface ChatListProps {
   searchQuery: string;
@@ -34,8 +35,8 @@ export const ChatList = ({ searchQuery }: ChatListProps) => {
     const lowerQuery = searchQuery.toLowerCase();
 
     return allChats.filter((chat) => {
-      const otherMember = chat.members.find((m) => m.user.id !== currentUserId);
-      const username = otherMember?.user?.username || '';
+      const recipient = getChatRecipient(chat, currentUserId);
+      const username = recipient?.username || '';
       return username.toLowerCase().includes(lowerQuery);
     });
   }, [allChats, searchQuery, currentUserId]);
