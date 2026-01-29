@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import { storageService } from '@shared/services/storage.service.ts';
-import type { Attachment } from '../model/types/attachment.type.ts';
-
-const MAX_FILES = 5;
-const MAX_SIZE = 10 * 1024 * 1024;
+import { storageService } from '@shared/services/storage.service';
+import type { Attachment } from '../model/types/attachment.type';
+import {
+  MAX_ATTACHMENT_SIZE,
+  MAX_ATTACHMENTS,
+} from '@shared/constants/app.constants';
 
 export const useAttachments = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -26,7 +27,7 @@ export const useAttachments = () => {
       const validFiles: File[] = [];
 
       Array.from(newFiles).forEach((file) => {
-        if (file.size > MAX_SIZE) {
+        if (file.size > MAX_ATTACHMENT_SIZE) {
           setError(`File ${file.name} is too large (max 10MB)`);
           return;
         }
@@ -36,9 +37,9 @@ export const useAttachments = () => {
       setFiles((prev) => {
         if (
           prev.length + validFiles.length + existingAttachments.length >
-          MAX_FILES
+          MAX_ATTACHMENTS
         ) {
-          setError(`You can only attach up to ${MAX_FILES} files`);
+          setError(`You can only attach up to ${MAX_ATTACHMENTS} files`);
           return prev;
         }
         return [...prev, ...validFiles];

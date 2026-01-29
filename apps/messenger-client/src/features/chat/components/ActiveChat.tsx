@@ -2,7 +2,7 @@ import { useAttachments } from '../hooks/use-attachments';
 import { ChatEmptyState } from './ChatEmptyState';
 import { ChatRecipientHeader } from './ChatRecipientHeader';
 import { MessageList } from './MessageList';
-import { MessageInput } from './MessageInput';
+import { MessageInput } from './message-input/MessageInput';
 import { FileDropZone } from './FileDropZone';
 import { useActiveChatSelection } from '../hooks/use-active-chat-selection';
 

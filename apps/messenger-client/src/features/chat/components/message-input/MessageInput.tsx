@@ -1,10 +1,10 @@
 import type { ChangeEvent } from 'react';
 import { Paperclip, Smile } from 'lucide-react';
-import { useAttachments } from '../hooks/use-attachments';
-import { AttachmentPreview } from './AttachmentPreview';
-import { useMessageInput } from '../hooks/use-message-input';
-import { EditBanner } from './message-input/EditBanner';
-import { SendButton } from './message-input/SendButton';
+import { useAttachments } from '../../hooks/use-attachments';
+import { AttachmentPreview } from '../AttachmentPreview';
+import { useMessageInput } from '../../hooks/use-message-input';
+import { EditBanner } from './EditBanner';
+import { SendButton } from './SendButton';
 
 interface MessageInputProps {
   chatId: string;
