@@ -17,7 +17,7 @@ services:
     build:
       context: ./apps/messenger-client
       dockerfile: Dockerfile
-      target: serve
+      target: production
     container_name: messenger-client
     restart: always
     ports:
