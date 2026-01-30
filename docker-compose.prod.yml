@@ -1,0 +1,30 @@
+name: messenger-app-prod
+
+services:
+  messenger-api:
+    build:
+      context: ./apps/messenger-api
+      dockerfile: Dockerfile
+      target: production
+    container_name: messenger-api
+    restart: always
+    env_file:
+      - .env.prod
+    networks:
+      - messenger-network
+
+  messenger-client:
+    build:
+      context: ./apps/messenger-client
+      dockerfile: Dockerfile
+      target: serve
+    container_name: messenger-client
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      - messenger-network
+
+networks:
+  messenger-network:
+    driver: bridge
