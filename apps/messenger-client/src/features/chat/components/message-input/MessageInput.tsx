@@ -1,5 +1,5 @@
 import type { ChangeEvent } from 'react';
-import { Paperclip, Smile } from 'lucide-react';
+import { Paperclip } from 'lucide-react';
 import { useAttachments } from '../../hooks/use-attachments';
 import { AttachmentPreview } from '../AttachmentPreview';
 import { useMessageInput } from '../../hooks/use-message-input';
@@ -7,6 +7,8 @@ import { EditBanner } from './EditBanner';
 import { SendButton } from './SendButton';
 import { MAX_MESSAGE_LENGTH } from '@shared/constants/app.constants';
 import { ReplyBanner } from '@features/chat/components/message-input/ReplyBanner';
+import type { EmojiClickData } from 'emoji-picker-react';
+import { EmojiPickerButton } from '@features/chat/components/message-input/EmojiPickerButton';
 
 interface MessageInputProps {
   chatId: string;
@@ -41,6 +43,32 @@ export const MessageInput = ({
       actions.addFiles(e.target.files);
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleEmojiSelect = (emojiData: EmojiClickData) => {
+    const emoji = emojiData.emoji;
+    const textarea = textareaRef.current;
+
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const newContent =
+        content.substring(0, start) + emoji + content.substring(end);
+
+      if (newContent.length <= MAX_MESSAGE_LENGTH) {
+        actions.setContent(newContent);
+
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(
+            start + emoji.length,
+            start + emoji.length,
+          );
+        }, 0);
+      }
+    } else {
+      actions.setContent(content + emoji);
+    }
   };
 
   return (
@@ -105,9 +133,10 @@ export const MessageInput = ({
             className="custom-scrollbar max-h-32 flex-1 resize-none border-none bg-transparent py-3 text-slate-800 outline-none placeholder:text-slate-400 focus:ring-0"
           />
 
-          <button className="mb-0.5 rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-200 hover:text-yellow-500">
-            <Smile size={20} />
-          </button>
+          <EmojiPickerButton
+            onEmojiSelect={handleEmojiSelect}
+            disabled={isUploading}
+          />
 
           <SendButton
             isUploading={isUploading}

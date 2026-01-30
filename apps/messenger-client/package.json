@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@tanstack/react-query": "^5.90.20",
     "axios": "^1.13.4",
+    "emoji-picker-react": "^4.17.3",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
