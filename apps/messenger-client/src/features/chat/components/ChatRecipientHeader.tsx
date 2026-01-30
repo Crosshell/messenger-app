@@ -54,9 +54,9 @@ export const ChatRecipientHeader = ({ chat }: ChatRecipientHeaderProps) => {
           <h2 className="leading-tight font-semibold text-slate-900">
             {recipient.username}
           </h2>
-          <span className="flex items-center gap-1 text-xs font-medium text-green-500">
-            <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-            Online
+          <span className="flex items-center gap-1 text-xs font-medium text-yellow-500">
+            <span className="h-1.5 w-1.5 rounded-full bg-yellow-500" />
+            Unknown
           </span>
         </div>
       </div>
