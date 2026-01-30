@@ -9,7 +9,7 @@ services:
     container_name: messenger-api
     restart: always
     env_file:
-      - .env.prod
+      - ./apps/messenger-api/.env
     networks:
       - messenger-network
 
