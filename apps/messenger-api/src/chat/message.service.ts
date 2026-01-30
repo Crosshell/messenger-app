@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { WsException } from '@nestjs/websockets';
 import { Message, Prisma } from '@prisma/client';
@@ -7,13 +11,23 @@ import { EditMessageDto } from './dto/edit-message.dto';
 import { MarkReadDto } from './dto/mark-read.dto';
 import { ConfigService } from '@nestjs/config';
 import { StorageService } from '../storage/storage.service';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
 @Injectable()
 export class MessageService {
   private readonly maxAttachments: number;
 
-  private readonly includeSender = {
+  private readonly includeRelations = {
     sender: { select: { id: true, username: true, avatarUrl: true } },
+    replyTo: {
+      select: {
+        id: true,
+        content: true,
+        senderId: true,
+        sender: { select: { username: true } },
+        attachments: { take: 1, select: { id: true, mimeType: true } },
+      },
+    },
   };
 
   constructor(
@@ -26,6 +40,23 @@ export class MessageService {
 
   async saveMessage(senderId: string, dto: SendMessageDto): Promise<Message> {
     await this.checkChatAccess(senderId, dto.chatId);
+
+    if (dto.replyToId) {
+      const parentMessage = await this.prisma.message.findUnique({
+        where: { id: dto.replyToId },
+        select: { chatId: true },
+      });
+
+      if (!parentMessage) {
+        throw new NotFoundException('Message to reply not found');
+      }
+
+      if (parentMessage.chatId !== dto.chatId) {
+        throw new BadRequestException(
+          'You can only reply to messages within the same chat',
+        );
+      }
+    }
 
     if (dto.attachments && dto.attachments.length > this.maxAttachments) {
       throw new WsException(
@@ -46,6 +77,7 @@ export class MessageService {
           senderId,
           content: dto.content,
           chatId: dto.chatId,
+          replyToId: dto.replyToId,
           attachments: dto.attachments
             ? {
                 create: dto.attachments.map((att) => ({
@@ -57,7 +89,7 @@ export class MessageService {
               }
             : undefined,
         },
-        include: { ...this.includeSender, attachments: true },
+        include: { ...this.includeRelations, attachments: true },
       });
 
       await tx.chat.update({
@@ -129,8 +161,25 @@ export class MessageService {
           content: dto.content,
           isEdited: true,
         },
-        include: { ...this.includeSender, attachments: true },
+        include: { ...this.includeRelations, attachments: true },
       });
+    });
+  }
+
+  async getMessages(
+    chatId: string,
+    { limit = 20, cursor }: PaginationDto,
+  ): Promise<Message[]> {
+    return this.prisma.message.findMany({
+      where: { chatId },
+      take: limit + 1,
+      cursor: cursor ? { id: cursor } : undefined,
+      skip: cursor ? 1 : 0,
+      include: {
+        ...this.includeRelations,
+        attachments: true,
+      },
+      orderBy: { createdAt: 'desc' },
     });
   }
 

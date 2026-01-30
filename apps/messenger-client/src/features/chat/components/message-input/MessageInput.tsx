@@ -5,6 +5,8 @@ import { AttachmentPreview } from '../AttachmentPreview';
 import { useMessageInput } from '../../hooks/use-message-input';
 import { EditBanner } from './EditBanner';
 import { SendButton } from './SendButton';
+import { MAX_MESSAGE_LENGTH } from '@shared/constants/app.constants';
+import { ReplyBanner } from '@features/chat/components/message-input/ReplyBanner';
 
 interface MessageInputProps {
   chatId: string;
@@ -19,10 +21,10 @@ export const MessageInput = ({
     content,
     textareaRef,
     fileInputRef,
+    messageToReply,
     isSubmitDisabled,
     isUploading,
     messageToEdit,
-    maxLength,
     actions,
   } = useMessageInput({ chatId, attachmentState });
 
@@ -58,6 +60,13 @@ export const MessageInput = ({
         />
       )}
 
+      {!messageToEdit && messageToReply && (
+        <ReplyBanner
+          message={messageToReply}
+          onCancel={actions.handleCancelReply}
+        />
+      )}
+
       <AttachmentPreview
         files={files}
         existingAttachments={existingAttachments}
@@ -88,7 +97,7 @@ export const MessageInput = ({
             onChange={actions.handleChange}
             onKeyDown={actions.handleKeyDown}
             onPaste={actions.handlePaste}
-            maxLength={maxLength}
+            maxLength={MAX_MESSAGE_LENGTH}
             placeholder={
               messageToEdit ? 'Edit your message...' : 'Type a message...'
             }
@@ -110,12 +119,12 @@ export const MessageInput = ({
 
         <div
           className={`px-1 text-right text-[10px] transition-colors ${
-            content.length >= maxLength
+            content.length >= MAX_MESSAGE_LENGTH
               ? 'font-bold text-red-500'
               : 'text-slate-400'
           }`}
         >
-          {content.length}/{maxLength}
+          {content.length}/{MAX_MESSAGE_LENGTH}
         </div>
       </div>
     </div>

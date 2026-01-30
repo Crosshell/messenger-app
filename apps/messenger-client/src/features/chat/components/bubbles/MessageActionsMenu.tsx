@@ -14,7 +14,7 @@ export const MessageActionsMenu = ({
 
   return (
     <div
-      className="relative mr-2 flex items-center opacity-0 transition-opacity group-hover/row:opacity-100"
+      className="relative flex items-center opacity-0 transition-opacity group-hover/row:opacity-100"
       onMouseLeave={() => setIsOpen(false)}
     >
       <button
@@ -25,7 +25,7 @@ export const MessageActionsMenu = ({
       </button>
 
       {isOpen && (
-        <div className="animate-in fade-in zoom-in-95 absolute right-0 bottom-8 z-10 flex w-32 flex-col overflow-hidden rounded-lg border border-slate-100 bg-white py-1 shadow-lg duration-100">
+        <div className="animate-in fade-in zoom-in-95 absolute bottom-8 z-10 flex w-32 flex-col overflow-hidden rounded-lg border border-slate-100 bg-white py-1 shadow-lg duration-100">
           <button
             onClick={() => {
               onEdit();

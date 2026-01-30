@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Chat, ChatType, Message } from '@prisma/client';
+import { Chat, ChatType } from '@prisma/client';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { PaginatedResponse } from '../common/responses/paginated.response';
 
@@ -104,23 +104,6 @@ export class ChatService {
         nextCursor,
       },
     };
-  }
-
-  async getChatMessages(
-    chatId: string,
-    { limit = 20, cursor }: PaginationDto,
-  ): Promise<Message[]> {
-    return this.prisma.message.findMany({
-      where: { chatId },
-      take: limit + 1,
-      cursor: cursor ? { id: cursor } : undefined,
-      skip: cursor ? 1 : 0,
-      include: {
-        sender: { select: { id: true, username: true, avatarUrl: true } },
-        attachments: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    });
   }
 
   async getChatMembers(chatId: string) {

@@ -12,4 +12,12 @@ export interface Message {
   isEdited: boolean;
   sender?: User;
   attachments?: Attachment[];
+  replyToId?: string;
+  replyTo?: {
+    id: string;
+    content?: string;
+    senderId: string;
+    sender: { username: string };
+    attachments?: { id: string; mimeType?: string }[];
+  };
 }

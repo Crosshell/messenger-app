@@ -83,6 +83,10 @@ model Message {
 
   attachments Attachment[]
 
+  replyToId String?   @map("reply_to_id")
+  replyTo   Message?  @relation("ReplyRelation", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   Message[] @relation("ReplyRelation")
+
   @@map("messages")
 }
 

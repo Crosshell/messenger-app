@@ -2,10 +2,12 @@ import { useCallback } from 'react';
 import { useSocket } from '@shared/hooks/use-socket.ts';
 import type { Attachment } from '../model/types/attachment.type.ts';
 import { useChatStore } from '../model/chat.store.ts';
+import type { Message } from '@features/chat/model/types/message.type';
 
 export const useMessageActions = (chatId: string) => {
   const socket = useSocket();
   const setMessageToEdit = useChatStore((state) => state.setMessageToEdit);
+  const setMessageToReply = useChatStore((state) => state.setMessageToReply);
 
   const editMessage = useCallback(
     (messageId: string, content: string, attachments: Attachment[] = []) => {
@@ -35,5 +37,12 @@ export const useMessageActions = (chatId: string) => {
     [socket, chatId],
   );
 
-  return { editMessage, deleteMessage };
+  const replyToMessage = useCallback(
+    (message: Message) => {
+      setMessageToReply(message);
+    },
+    [setMessageToReply],
+  );
+
+  return { editMessage, deleteMessage, replyToMessage };
 };

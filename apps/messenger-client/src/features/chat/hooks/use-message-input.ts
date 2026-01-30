@@ -25,7 +25,9 @@ export const useMessageInput = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { messageToEdit, setMessageToEdit } = useChatStore();
+  const { messageToEdit, setMessageToEdit, messageToReply, setMessageToReply } =
+    useChatStore();
+
   const { sendMessage } = useSendMessage(chatId);
   const { editMessage } = useMessageActions(chatId);
 
@@ -89,11 +91,13 @@ export const useMessageInput = ({
         const finalAttachments = [...existingAttachments, ...newAttachments];
         editMessage(messageToEdit.id, content.trim(), finalAttachments);
       } else {
-        sendMessage(content, newAttachments);
+        sendMessage(content, newAttachments, messageToReply?.id);
       }
 
       setContent('');
       clearFiles();
+      setMessageToReply(null);
+
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
         textareaRef.current.focus();
@@ -127,6 +131,10 @@ export const useMessageInput = ({
     }
   };
 
+  const handleCancelReply = () => {
+    setMessageToReply(null);
+  };
+
   const handleCancelEdit = () => {
     setMessageToEdit(null);
     setContent('');
@@ -149,9 +157,10 @@ export const useMessageInput = ({
     isSubmitDisabled,
     isUploading,
     messageToEdit,
-    maxLength: MAX_MESSAGE_LENGTH,
+    messageToReply,
     actions: {
       setContent,
+      handleCancelReply,
       handleSend,
       handleKeyDown,
       handleChange,

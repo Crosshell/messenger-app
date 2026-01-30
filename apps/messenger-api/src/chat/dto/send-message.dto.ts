@@ -19,6 +19,11 @@ export class SendMessageDto {
   @Length(0, 3000)
   content?: string;
 
+  @IsOptional()
+  @IsString()
+  @IsUUID()
+  replyToId?: string;
+
   @IsArray()
   @IsOptional()
   @ValidateNested({ each: true })

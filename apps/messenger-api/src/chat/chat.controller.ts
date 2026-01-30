@@ -17,12 +17,14 @@ import { CreateChatDto } from './dto/create-chat.dto';
 import { Chat, Message } from '@prisma/client';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { ChatGateway } from './chat.gateway';
+import { MessageService } from './message.service';
 
 @Controller('chats')
 @Authorization()
 export class ChatController {
   constructor(
     private readonly service: ChatService,
+    private readonly messageService: MessageService,
     private readonly chatGateway: ChatGateway,
   ) {}
 
@@ -48,7 +50,7 @@ export class ChatController {
     @Param('chatId', ParseUUIDPipe) chatId: string,
     @Query() dto: PaginationDto,
   ): Promise<Message[]> {
-    return this.service.getChatMessages(chatId, dto);
+    return this.messageService.getMessages(chatId, dto);
   }
 
   @Delete(':chatId')
