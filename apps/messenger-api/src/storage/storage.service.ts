@@ -3,11 +3,13 @@ import { ConfigService } from '@nestjs/config';
 import {
   S3Client,
   PutObjectCommand,
-  DeleteObjectCommand,
+  DeleteObjectsCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { extname } from 'path';
 import { randomUUID } from 'node:crypto';
+import { GetPresignedUrlDto } from './dto/get-presigned-url.dto';
+import { PresignedUpload } from './responses/presigned-upload.response';
 
 @Injectable()
 export class StorageService {
@@ -17,31 +19,31 @@ export class StorageService {
 
   constructor(private readonly config: ConfigService) {
     this.s3Client = new S3Client({
-      region: this.config.getOrThrow('aws.region'),
+      region: this.config.getOrThrow<string>('aws.region'),
       credentials: {
-        accessKeyId: this.config.getOrThrow('aws.accessKeyId'),
-        secretAccessKey: this.config.getOrThrow('aws.secretAccessKey'),
+        accessKeyId: this.config.getOrThrow<string>('aws.accessKeyId'),
+        secretAccessKey: this.config.getOrThrow<string>('aws.secretAccessKey'),
       },
     });
-    this.bucketName = this.config.getOrThrow('aws.bucketName');
-    this.maxFileSize = this.config.getOrThrow('upload.maxFileSize');
+    this.bucketName = this.config.getOrThrow<string>('aws.bucketName');
+    this.maxFileSize = this.config.getOrThrow<number>('upload.maxFileSize');
   }
 
-  async getPresignedUrl(filename: string, contentType: string, size: number) {
-    if (size > this.maxFileSize) {
+  async getPresignedUrl(dto: GetPresignedUrlDto): Promise<PresignedUpload> {
+    if (dto.size > this.maxFileSize) {
       throw new BadRequestException(
         `File size exceeds limit of ${this.maxFileSize / 1024 / 1024}MB`,
       );
     }
 
-    const fileExt = extname(filename);
+    const fileExt = extname(dto.filename);
     const key = `uploads/${randomUUID()}${fileExt}`;
 
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
       Key: key,
-      ContentType: contentType || 'application/octet-stream',
-      ContentLength: size,
+      ContentType: dto.contentType || 'application/octet-stream',
+      ContentLength: dto.size,
     });
 
     const url = await getSignedUrl(this.s3Client, command, { expiresIn: 300 });
@@ -54,11 +56,17 @@ export class StorageService {
     };
   }
 
-  async deleteFile(key: string): Promise<void> {
-    const command = new DeleteObjectCommand({
+  async deleteFiles(keys: string[]): Promise<void> {
+    if (keys.length === 0) return;
+
+    const command = new DeleteObjectsCommand({
       Bucket: this.bucketName,
-      Key: key,
+      Delete: {
+        Objects: keys.map((Key) => ({ Key })),
+        Quiet: true,
+      },
     });
+
     await this.s3Client.send(command);
   }
 

@@ -29,9 +29,9 @@ export class UserService {
       where,
       omit: { password: true },
     });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+
+    if (!user) throw new NotFoundException('User not found');
+
     return user;
   }
 
@@ -40,18 +40,14 @@ export class UserService {
     username: string,
   ): Promise<UserWithoutPassword | null> {
     return this.prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { username }],
-      },
+      where: { OR: [{ email }, { username }] },
       omit: { password: true },
     });
   }
 
   async findOneWithPassword(login: string): Promise<User | null> {
     return this.prisma.user.findFirst({
-      where: {
-        OR: [{ email: login }, { username: login }],
-      },
+      where: { OR: [{ email: login }, { username: login }] },
     });
   }
 
@@ -69,33 +65,20 @@ export class UserService {
   ): Promise<UserWithoutPassword> {
     const currentUser = await this.findOneOrThrow({ id: userId });
 
-    if (dto.username && dto.username !== currentUser.username) {
-      const existingUser = await this.prisma.user.findUnique({
-        where: { username: dto.username },
-      });
+    await this.ensureUsernameIsUnique(dto.username, currentUser.username);
 
-      if (existingUser) {
-        throw new ConflictException('Username is already taken');
-      }
+    const s3KeyToDelete = this.getOldAvatarKeyIfChanged(
+      currentUser.avatarUrl,
+      dto.avatarUrl,
+    );
+
+    const updatedUser = await this.update({ id: userId }, dto);
+
+    if (s3KeyToDelete) {
+      void this.storageService.deleteFiles([s3KeyToDelete]);
     }
 
-    if (
-      dto.avatarUrl !== undefined &&
-      dto.avatarUrl !== currentUser.avatarUrl
-    ) {
-      if (currentUser.avatarUrl) {
-        const key = this.storageService.extractKeyFromUrl(
-          currentUser.avatarUrl,
-        );
-        if (key) {
-          await this.storageService.deleteFile(key).catch((err) => {
-            console.error('Failed to delete old avatar from S3:', err);
-          });
-        }
-      }
-    }
-
-    return this.update({ id: userId }, dto);
+    return updatedUser;
   }
 
   async update(
@@ -103,29 +86,30 @@ export class UserService {
     data: Prisma.UserUpdateInput,
   ): Promise<UserWithoutPassword> {
     await this.findOneOrThrow(where);
-    return this.prisma.user.update({ where, data, omit: { password: true } });
+
+    return this.prisma.user.update({
+      where,
+      data,
+      omit: { password: true },
+    });
   }
 
   async findMany(
     dto: FindManyUsersDto,
   ): Promise<PaginatedResponse<UserWithoutPassword>> {
-    const { username, page = 1, limit = 20 } = dto;
+    const { page = 1, limit = 20 } = dto;
     const skip = (page - 1) * limit;
+    const where = this.buildSearchFilter(dto.username);
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
-        where: {
-          username: { contains: username, mode: 'insensitive' },
-        },
+        where,
         skip,
         take: limit,
         omit: { password: true },
+        orderBy: { username: 'asc' },
       }),
-      this.prisma.user.count({
-        where: {
-          username: { contains: username, mode: 'insensitive' },
-        },
-      }),
+      this.prisma.user.count({ where }),
     ]);
 
     return {
@@ -134,6 +118,42 @@ export class UserService {
         total,
         page,
         totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  private async ensureUsernameIsUnique(
+    newUsername: string | undefined,
+    currentUsername: string,
+  ): Promise<void> {
+    if (!newUsername || newUsername === currentUsername) return;
+
+    const existingUser = await this.prisma.user.findUnique({
+      where: { username: newUsername },
+      select: { id: true },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('Username is already taken');
+    }
+  }
+
+  private getOldAvatarKeyIfChanged(
+    currentUrl: string | null,
+    newUrl?: string | null,
+  ): string | null {
+    if (newUrl === undefined || newUrl === currentUrl) return null;
+
+    if (!currentUrl) return null;
+
+    return this.storageService.extractKeyFromUrl(currentUrl);
+  }
+
+  private buildSearchFilter(username: string): Prisma.UserWhereInput {
+    return {
+      username: {
+        contains: username,
+        mode: 'insensitive',
       },
     };
   }

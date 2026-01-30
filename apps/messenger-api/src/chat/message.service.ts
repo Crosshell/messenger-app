@@ -118,35 +118,31 @@ export class MessageService {
       throw new WsException('Access denied');
     }
 
-    const newAttachmentUrls = dto.attachments?.map((a) => a.url) || [];
+    const newAttachmentUrls = new Set(dto.attachments?.map((a) => a.url) || []);
 
     const attachmentsToDelete = message.attachments.filter(
-      (oldAtt) => !newAttachmentUrls.includes(oldAtt.url),
+      (oldAtt) => !newAttachmentUrls.has(oldAtt.url),
     );
 
-    for (const att of attachmentsToDelete) {
+    const s3KeysToDelete: string[] = [];
+    attachmentsToDelete.forEach((att) => {
       const key = this.storageService.extractKeyFromUrl(att.url);
-      if (key) {
-        await this.storageService
-          .deleteFile(key)
-          .catch((e) => console.error('S3 Delete Error:', e));
-      }
-    }
+      if (key) s3KeysToDelete.push(key);
+    });
 
-    return this.prisma.$transaction(async (tx) => {
-      if (attachmentsToDelete.length > 0) {
+    const updatedMessage = await this.prisma.$transaction(async (tx) => {
+      if (attachmentsToDelete.length) {
         await tx.attachment.deleteMany({
           where: { id: { in: attachmentsToDelete.map((a) => a.id) } },
         });
       }
 
-      const existingUrls = message.attachments.map((a) => a.url);
+      const existingUrls = new Set(message.attachments.map((a) => a.url));
       const attachmentsToCreate =
-        dto.attachments?.filter(
-          (newAtt) => !existingUrls.includes(newAtt.url),
-        ) || [];
+        dto.attachments?.filter((newAtt) => !existingUrls.has(newAtt.url)) ||
+        [];
 
-      if (attachmentsToCreate.length > 0) {
+      if (attachmentsToCreate.length) {
         await tx.attachment.createMany({
           data: attachmentsToCreate.map((att) => ({
             ...att,
@@ -164,6 +160,10 @@ export class MessageService {
         include: { ...this.includeRelations, attachments: true },
       });
     });
+
+    void this.storageService.deleteFiles(s3KeysToDelete);
+
+    return updatedMessage;
   }
 
   async getMessages(
@@ -186,15 +186,26 @@ export class MessageService {
   async deleteMessage(userId: string, messageId: string): Promise<Message> {
     const message = await this.prisma.message.findUnique({
       where: { id: messageId },
+      include: { attachments: true },
     });
 
     if (!message || message.senderId !== userId) {
       throw new WsException('Access denied');
     }
 
-    return this.prisma.message.delete({
+    const s3KeysToDelete: string[] = [];
+    message.attachments.forEach((att) => {
+      const key = this.storageService.extractKeyFromUrl(att.url);
+      if (key) s3KeysToDelete.push(key);
+    });
+
+    const deletedMessage = await this.prisma.message.delete({
       where: { id: messageId },
     });
+
+    void this.storageService.deleteFiles(s3KeysToDelete);
+
+    return deletedMessage;
   }
 
   async markAsRead(userId: string, dto: MarkReadDto): Promise<Date | null> {
