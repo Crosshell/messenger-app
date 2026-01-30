@@ -1,7 +1,7 @@
 import { MessageStatus } from '@features/chat/components/bubbles/MessageStatus';
 import { AttachmentItem } from '@features/chat/components/AttachmentItem';
 import { useMessageActions } from '@features/chat/hooks/use-message-actions';
-import { ReplyPreview } from '@features/chat/components/message-input/ReplyPreview';
+import { ReplyPreview } from '@features/chat/components/bubbles/ReplyPreview';
 import { useMessageItem } from '@features/chat/hooks/use-message-item';
 import type { Message } from '@features/chat/model/types/message.type';
 import { Reply } from 'lucide-react';

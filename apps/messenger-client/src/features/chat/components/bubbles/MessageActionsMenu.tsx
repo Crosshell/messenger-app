@@ -12,13 +12,12 @@ export const MessageActionsMenu = ({
 }: MessageActionsMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const toggleOpen = () => setIsOpen(!isOpen);
+
   return (
-    <div
-      className="relative flex items-center opacity-0 transition-opacity group-hover/row:opacity-100"
-      onMouseLeave={() => setIsOpen(false)}
-    >
+    <div className="relative flex items-center opacity-0 transition-opacity group-hover/row:opacity-100">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleOpen}
         className="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
       >
         <MoreVertical size={16} />
