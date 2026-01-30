@@ -29,7 +29,20 @@ export class ChatService {
       throw new BadRequestException('Self-chat is not allowed');
     }
 
-    const existingChat = await this.prisma.chat.findFirst({
+    const existingChat = await this.findExistingDirectChat(
+      currentUserId,
+      targetUserId,
+    );
+    if (existingChat) return existingChat;
+
+    return this.createDirectChat(currentUserId, targetUserId);
+  }
+
+  private async findExistingDirectChat(
+    currentUserId: string,
+    targetUserId: string,
+  ): Promise<Chat | null> {
+    return this.prisma.chat.findFirst({
       where: {
         AND: [
           { members: { some: { userId: currentUserId } } },
@@ -39,9 +52,12 @@ export class ChatService {
       },
       include: this.includeMembers,
     });
+  }
 
-    if (existingChat) return existingChat;
-
+  private async createDirectChat(
+    currentUserId: string,
+    targetUserId: string,
+  ): Promise<Chat> {
     return this.prisma.chat.create({
       data: {
         type: ChatType.DIRECT,
@@ -62,7 +78,7 @@ export class ChatService {
     const chats = await this.prisma.chat.findMany({
       where: { members: { some: { userId } } },
       orderBy: { lastMessageAt: 'desc' },
-      take: take,
+      take,
       cursor: cursor ? { id: cursor } : undefined,
       skip: cursor ? 1 : 0,
       include: {
@@ -74,19 +90,13 @@ export class ChatService {
         },
         _count: {
           select: {
-            messages: {
-              where: {
-                isRead: false,
-                senderId: { not: userId },
-              },
-            },
+            messages: { where: { isRead: false, senderId: { not: userId } } },
           },
         },
       },
     });
 
     let nextCursor: string | null = null;
-
     if (chats.length > limit) {
       chats.pop();
       nextCursor = chats[chats.length - 1].id;
@@ -98,12 +108,7 @@ export class ChatService {
       _count: undefined,
     }));
 
-    return {
-      data: formattedChats,
-      meta: {
-        nextCursor,
-      },
-    };
+    return { data: formattedChats, meta: { nextCursor } };
   }
 
   async getChatMembers(chatId: string) {
@@ -116,31 +121,17 @@ export class ChatService {
   async deleteChat(userId: string, chatId: string) {
     const chat = await this.prisma.chat.findUnique({
       where: { id: chatId },
-      include: {
-        members: true,
-        messages: {
-          where: { attachments: { some: {} } },
-          include: { attachments: true },
-        },
-      },
+      include: { members: true },
     });
 
-    if (!chat) {
-      throw new NotFoundException('Chat not found');
-    }
+    if (!chat) throw new NotFoundException('Chat not found');
 
     const isMember = chat.members.some((member) => member.userId === userId);
-    if (!isMember) {
-      throw new ForbiddenException('You represent not a member of this chat');
-    }
+    if (!isMember)
+      throw new ForbiddenException('You are not a member of this chat');
 
-    await this.prisma.chat.delete({
-      where: { id: chatId },
-    });
+    await this.prisma.chat.delete({ where: { id: chatId } });
 
-    return {
-      id: chatId,
-      members: chat.members,
-    };
+    return { id: chatId, members: chat.members };
   }
 }
