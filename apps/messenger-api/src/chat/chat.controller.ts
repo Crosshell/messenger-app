@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -15,11 +16,15 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { Chat, Message } from '@prisma/client';
 import { PaginationDto } from '../common/dto/pagination.dto';
+import { ChatGateway } from './chat.gateway';
 
 @Controller('chats')
 @Authorization()
 export class ChatController {
-  constructor(private readonly service: ChatService) {}
+  constructor(
+    private readonly service: ChatService,
+    private readonly chatGateway: ChatGateway,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.OK)
@@ -44,5 +49,18 @@ export class ChatController {
     @Query() dto: PaginationDto,
   ): Promise<Message[]> {
     return this.service.getChatMessages(chatId, dto);
+  }
+
+  @Delete(':chatId')
+  @HttpCode(HttpStatus.OK)
+  async deleteChat(
+    @CurrentUser('sub') currentUserId: string,
+    @Param('chatId', ParseUUIDPipe) chatId: string,
+  ) {
+    const result = await this.service.deleteChat(currentUserId, chatId);
+
+    const userRooms = result.members.map(({ userId }) => `user_${userId}`);
+
+    this.chatGateway.notifyChatDeleted(userRooms, result.id);
   }
 }

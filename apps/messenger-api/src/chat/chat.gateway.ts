@@ -139,6 +139,10 @@ export class ChatGateway implements OnGatewayConnection {
     });
   }
 
+  notifyChatDeleted(userRooms: string[], chatId: string) {
+    this.server.to(userRooms).emit('chatDeleted', { chatId });
+  }
+
   private extractToken(client: Socket): string | undefined {
     const [type, token] =
       client.handshake.headers.authorization?.split(' ') ?? [];

@@ -1,8 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Chat, ChatType, Message } from '@prisma/client';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { PaginatedResponse } from '../common/responses/paginated.response';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class ChatService {
@@ -14,7 +20,10 @@ export class ChatService {
     },
   };
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly storageService: StorageService,
+  ) {}
 
   async getOrCreateChat(
     currentUserId: string,
@@ -123,5 +132,36 @@ export class ChatService {
       where: { chatId },
       select: { userId: true },
     });
+  }
+
+  async deleteChat(userId: string, chatId: string) {
+    const chat = await this.prisma.chat.findUnique({
+      where: { id: chatId },
+      include: {
+        members: true,
+        messages: {
+          where: { attachments: { some: {} } },
+          include: { attachments: true },
+        },
+      },
+    });
+
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    const isMember = chat.members.some((member) => member.userId === userId);
+    if (!isMember) {
+      throw new ForbiddenException('You represent not a member of this chat');
+    }
+
+    await this.prisma.chat.delete({
+      where: { id: chatId },
+    });
+
+    return {
+      id: chatId,
+      members: chat.members,
+    };
   }
 }
