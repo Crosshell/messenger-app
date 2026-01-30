@@ -75,19 +75,8 @@ export const useAttachments = () => {
 
     try {
       if (files.length > 0) {
-        await Promise.all(
-          files.map(async (file) => {
-            const { uploadUrl, fileUrl } =
-              await storageService.getPresignedUrl(file);
-            await storageService.uploadToS3(uploadUrl, file);
-            uploadedAttachments.push({
-              url: fileUrl,
-              filename: file.name,
-              mimeType: file.type,
-              size: file.size,
-            });
-          }),
-        );
+        const newAttachments = await storageService.uploadFiles(files);
+        uploadedAttachments.push(...newAttachments);
       }
       return uploadedAttachments;
     } catch (err) {
