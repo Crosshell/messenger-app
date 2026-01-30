@@ -5,12 +5,14 @@ interface FileDropZoneProps {
   onFilesDrop: (files: FileList) => void;
   children: ReactNode;
   disabled?: boolean;
+  variant?: 'default' | 'compact';
 }
 
 export const FileDropZone = ({
   onFilesDrop,
   children,
   disabled,
+  variant = 'default',
 }: FileDropZoneProps) => {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -53,13 +55,19 @@ export const FileDropZone = ({
     >
       {isDragging && (
         <div className="animate-in fade-in pointer-events-none absolute inset-0 z-50 flex flex-col items-center justify-center border-2 border-dashed border-purple-500 bg-purple-500/10 backdrop-blur-sm duration-200">
-          <UploadCloud
-            size={64}
-            className="mb-4 animate-bounce text-purple-600"
-          />
-          <p className="text-xl font-bold text-purple-700">
-            Drop files to upload
-          </p>
+          {variant === 'compact' ? (
+            <UploadCloud size={32} className="animate-bounce text-purple-600" />
+          ) : (
+            <>
+              <UploadCloud
+                size={64}
+                className="mb-4 animate-bounce text-purple-600"
+              />
+              <p className="text-xl font-bold text-purple-700">
+                Drop files to upload
+              </p>
+            </>
+          )}
         </div>
       )}
       {children}

@@ -3,7 +3,7 @@ import { ChatEmptyState } from './ChatEmptyState';
 import { ChatRecipientHeader } from './ChatRecipientHeader';
 import { MessageList } from './MessageList';
 import { MessageInput } from './message-input/MessageInput';
-import { FileDropZone } from './FileDropZone';
+import { FileDropZone } from '@components/FileDropZone';
 import { useActiveChatSelection } from '../hooks/use-active-chat-selection';
 
 export const ActiveChat = () => {

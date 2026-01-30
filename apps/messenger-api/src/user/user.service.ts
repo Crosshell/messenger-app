@@ -1,13 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 import { UserWithoutPassword } from './types/user-without-password.type';
 import { FindManyUsersDto } from './dto/find-many-users.dto';
 import { PaginatedResponse } from '../common/responses/paginated.response';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly storageService: StorageService,
+  ) {}
 
   async create(data: Prisma.UserCreateInput): Promise<UserWithoutPassword> {
     return this.prisma.user.create({ data, omit: { password: true } });
@@ -54,12 +63,47 @@ export class UserService {
     await this.update({ id: userId }, { isEmailVerified: true });
   }
 
+  async updateProfile(
+    userId: string,
+    dto: UpdateUserDto,
+  ): Promise<UserWithoutPassword> {
+    const currentUser = await this.findOneOrThrow({ id: userId });
+
+    if (dto.username && dto.username !== currentUser.username) {
+      const existingUser = await this.prisma.user.findUnique({
+        where: { username: dto.username },
+      });
+
+      if (existingUser) {
+        throw new ConflictException('Username is already taken');
+      }
+    }
+
+    if (
+      dto.avatarUrl !== undefined &&
+      dto.avatarUrl !== currentUser.avatarUrl
+    ) {
+      if (currentUser.avatarUrl) {
+        const key = this.storageService.extractKeyFromUrl(
+          currentUser.avatarUrl,
+        );
+        if (key) {
+          await this.storageService.deleteFile(key).catch((err) => {
+            console.error('Failed to delete old avatar from S3:', err);
+          });
+        }
+      }
+    }
+
+    return this.update({ id: userId }, dto);
+  }
+
   async update(
     where: Prisma.UserWhereUniqueInput,
     data: Prisma.UserUpdateInput,
-  ): Promise<void> {
+  ): Promise<UserWithoutPassword> {
     await this.findOneOrThrow(where);
-    await this.prisma.user.update({ where, data, omit: { password: true } });
+    return this.prisma.user.update({ where, data, omit: { password: true } });
   }
 
   async findMany(
