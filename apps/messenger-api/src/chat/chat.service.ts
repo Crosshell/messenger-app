@@ -8,7 +8,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Chat, ChatType, Message } from '@prisma/client';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { PaginatedResponse } from '../common/responses/paginated.response';
-import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class ChatService {
@@ -20,10 +19,7 @@ export class ChatService {
     },
   };
 
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly storageService: StorageService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getOrCreateChat(
     currentUserId: string,
